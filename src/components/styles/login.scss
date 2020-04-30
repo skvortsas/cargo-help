@@ -1,0 +1,48 @@
+.login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+
+    .tablet {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        width: 500px;
+        height: 300px;
+        border-radius: 5px;
+        border: 1px solid #ce9f51;
+
+        .brand-logo {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+
+            img {
+                width: 100px;
+            }
+        }
+
+        button {
+            cursor: pointer;
+            background-color: transparent;
+            width: 70%;
+            height: 80px;
+            color: #ce9f51;
+            border: none;
+            border-left: 1px solid #ce9f51;
+            border-right: 1px solid #ce9f51;
+            box-shadow: inset 0 0 0 0 #ce9f51;
+            transition: 0.3s ease-in-out;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            font-size: 30px;
+
+            &:hover {
+                box-shadow: inset 400px 0 0 0 #ce9f51;
+                color: black;
+            }
+        }
+    }
+}
