@@ -23,7 +23,7 @@ function App() {
       <Router history={history}>
         {
           isAuthenticated
-          ? <NavBar />
+          ? <NavBar history={history} />
           : false
         }
         { 

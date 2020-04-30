@@ -20,7 +20,7 @@ import { AccountBalanceWallet } from '@material-ui/icons';
 import { LocalShipping } from '@material-ui/icons';
 import { SnackbarProvider } from 'notistack';
 
-const WayList = ({ match }) => {
+const WayList = ({ match, history }) => {
     const [chosenNumber, setChosenNumber] = useState('0');
     const [chosenYear, setChosenYear] = useState('1999');
     const [changingWayList, setChangingWayList] = useState(false);
@@ -38,9 +38,14 @@ const WayList = ({ match }) => {
     }
 
     const switchPage = event => {
-        console.log(event.target.parentNode.id);
         setPage(event.target.parentNode.id)
     }
+
+    useEffect(() => {
+    window.onpopstate  = (e) => {
+      setPage(history.location.pathname.split('/')[2]);
+    }
+    }, []);
 
     useEffect(() => {
         const number = document.getElementById('number').value;
