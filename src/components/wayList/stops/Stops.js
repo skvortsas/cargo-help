@@ -82,7 +82,7 @@ const Stops = (props) => {
       if (updateResponse.success === true) {
           handleClickVariant(updateResponse.msg ,'success');
       } else if(updateResponse.success === false) {
-          handleClickVariant(updateResponse.msg, 'error');
+          handleClickVariant(getError(updateResponse.msg), 'error');
       }
   }, [updateResponse]);
 
@@ -217,6 +217,17 @@ const updateCountableCells = async old => {
     let difference = date_end - date_start;
     let differenceDays = Math.ceil(difference/(1000 * 60 * 60 * 24));
     old[i].day_amount = differenceDays;
+  }
+}
+
+const getError = errno => {
+  console.log(errno);
+  switch(errno) {
+    case 1265:
+    case 1292:
+      return 'В этой ячейке нельзя оставлять пустое поле';
+    case 1366:
+      return 'Неподходящее значение в ячейке';
   }
 }
 

@@ -1,4 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import { useAuth0 } from "../../react-auth0-spa";
 
 import MaUTable from '@material-ui/core/Table'
 import PropTypes from 'prop-types'
@@ -18,7 +21,11 @@ import {
   usePagination,
   useSortBy,
   useTable,
-} from 'react-table'
+} from 'react-table';
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const spanStyle = {
   padding: 0,
@@ -76,6 +83,12 @@ const EditableCell = ({
       console.log('clicked on ', e.target.value);
   }
 
+  const inputOnEnterPressed = e => {
+    if (e.keyCode === 13) {
+      e.target.blur();
+    }
+  }
+
   // If the initialValue is changed externall, sync it up with our state
   React.useEffect(() => {
     setValue(initialValue)
@@ -88,12 +101,18 @@ const EditableCell = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
+            onKeyUp={inputOnEnterPressed}
           />)
           : (
             <div style={inputRowStyle}>
-                <EditIcon 
-                style={editIconStyles}
-                onClick={onClick}/>
+                {
+                  id === 'car_parts' || id === 'wheels' || id === 'income'
+                  || id === 'driver_salary'
+                  ? ('')
+                  : (<EditIcon 
+                    style={editIconStyles}
+                    onClick={onClick}/>)
+                }
                 <input
                 style={spanStyle}
                 value={value}
@@ -129,15 +148,37 @@ EditableCell.propTypes = {
 const EnhancedTable = ({
   columns,
   data,
-  setData,
   updateMyData,
   skipPageReset,
   searchQuery,
   setSearchQuery,
   selectValue,
   setSelectValue,
+  getMainData,
+  formatDate
 }) => {
   const classes = useTableStyles();
+  const [toast, setToast] = useState(false);
+  const [addResponse, setAddResponse] = useState({});
+  const { getTokenSilently } = useAuth0();
+
+  const toastOpen = () => {
+    setToast(true);
+  };
+  
+  const handleToastClose = (event, reason) => {
+    if (reason === 'clickaway') {
+        return;
+      }
+  
+    setToast(false);
+  };
+
+  useEffect(() => {
+    if(addResponse.success) {
+      toastOpen();
+    }
+  }, [addResponse]);
 
   const {
     getTableProps,
@@ -173,12 +214,45 @@ const EnhancedTable = ({
   const handleChangeRowsPerPage = event => {
     setPageSize(Number(event.target.value))
   }
+  const addUserHandler = async user => {
+    const postBody = {
+        "number": user.way_list_number,
+        "year": user.way_list_year,
+        "driver": user.driver,
+        "number_of_tractor": user.number_of_tractor,
+        "number_of_installation": user.number_of_installation,
+        "date_start": formatDate(user.date_start),
+        "date_end": formatDate(user.date_end),
+        "speedometer_start": user.speedometer_start,
+        "speedometer_end": user.speedometer_end,
+        "average_tractor_expenses": user.average_tractor_expenses,
+        "average_installation_expenses": user.average_installation_expenses,
+        "earned": user.earned,
+        "expenses": user.expenses,
+        "fuel": user.fuel,
+    }
 
-  const addUserHandler = user => {
-      user.distance = user.speedometer_come - user.speedometer_away;
-    const newData = [user].concat(data);
-    setData(newData);
-  }
+    try {
+        const token = await getTokenSilently();
+
+        const response = await fetch('http://localhost:3001/api/addMain', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postBody)
+            });
+
+            const responseData = await response.json();
+
+            setAddResponse(responseData);
+    } catch (err) {
+        console.log(err);
+    } finally {
+        getMainData();
+    }
+  };
 
   // Render the UI for your table
   return (
@@ -255,6 +329,17 @@ const EnhancedTable = ({
         selectValue={selectValue}
         setSelectValue={setSelectValue}
       />
+      <Snackbar
+        open={toast}
+        autoHideDuration={2000}
+        onClose={handleToastClose}
+      >
+          <Alert onClose={handleToastClose} severity={addResponse.success ? "success" : "error"}>
+          {
+            addResponse.success ? "Успешно обновлено" : "Произошла ошибка"
+          }
+        </Alert>
+      </Snackbar>
       </>
   )
 }

@@ -1,9 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
-import CssBaseline from '@material-ui/core/CssBaseline'
-import EnhancedTable from './EnhancedTable'
-import makeData from './makeData'
-import '../styles/main.scss'
+import CssBaseline from '@material-ui/core/CssBaseline';
+import EnhancedTable from './EnhancedTable';
+import { useAuth0 } from "../../react-auth0-spa";
+import '../styles/main.scss';
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const App = () => {
   const columns = React.useMemo(
@@ -26,11 +32,11 @@ const App = () => {
       },
       {
         Header: 'Дата отбытия',
-        accessor: 'date_of_away',
+        accessor: 'date_start',
       },
       {
         Header: 'Дата прибытия',
-        accessor: 'date_of_come',
+        accessor: 'date_end',
       },
       {
         Header: 'Пройдено КМ',
@@ -38,11 +44,11 @@ const App = () => {
       },
       {
         Header: 'Ср. расход тягача',
-        accessor: 'medium_tractor_expenses',
+        accessor: 'average_tractor_expenses',
       },
       {
         Header: 'Ср. расход инсталяции',
-        accessor: 'medium_installation_expenses',
+        accessor: 'average_installation_expenses',
       },
       {
         Header: 'Заработано',
@@ -74,12 +80,55 @@ const App = () => {
       }
     ],
     []
-  )
+  );
 
-  const [data, setData] = React.useState(React.useMemo(() => makeData(20), []))
-  const [skipPageReset, setSkipPageReset] = React.useState(false)
+  const { getTokenSilently } = useAuth0();
+  const [toast, setToast] = useState(false);
+  const [apiMessage, setApiMessage] = useState({});
+  const [ updateResponse, setUpdateResponse ] = useState({});
+  const [skipPageReset, setSkipPageReset] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectValue, setSelectValue] = useState('');
+
+  const getMainData = async () => {
+try {
+  const token = await getTokenSilently();
+
+  const response = await fetch("http://localhost:3001/api/getMain", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+
+  const responseData = await response.json();
+
+  setApiMessage(responseData);
+} catch (error) {
+  console.error(error);
+}
+}
+
+useEffect(() => {
+  getMainData();
+});
+
+const toastOpen = () => {
+  setToast(true);
+};
+
+const handleToastClose = (event, reason) => {
+  if (reason === 'clickaway') {
+      return;
+    }
+
+  setToast(false);
+};
+
+useEffect(() => {
+  if (typeof(updateResponse.success) === "boolean") {
+    toastOpen();
+  }
+}, [updateResponse]);
 
   // We need to keep the table from resetting the pageIndex when we
   // Update data. So we can keep track of that flag with a ref.
@@ -89,50 +138,109 @@ const App = () => {
   // original data
   const updateMyData = (rowIndex, columnId, value) => {
     // We also turn on the flag to not reset the page
-    setSkipPageReset(true)
-    setData(old =>
-      old.map((row, index) => {
-        if (index === rowIndex) {
-          return {
-            ...old[rowIndex],
-            [columnId]: value,
-          }
-        }
-        return row
-      })
-    )
-  }
+    setSkipPageReset(true);
+    setApiMessage(async old => {
+      let newValue = value;
+      const column = columnId;
+      let id = undefined;
 
-  function formatDate(dateString) {
-    let dates = dateString.split('.');
-    return([dates[2], dates[1], dates[0]].join('-'));
-}
+      old.msg.map((row, index) => {
+        if (index === rowIndex) {
+            id = old.msg[index].id;
+            newValue = columnId === 'date_start'
+            || columnId === 'date_end' ? formatDate(newValue) : newValue;
+        }
+    })
+
+      const updateBody = {
+          "id": id,
+          "value": newValue,
+          "column": column
+      }
+      try {
+          const token = await getTokenSilently();
+
+          const response = await fetch('http://localhost:3001/api/updateMain', {
+              method: 'PUT',
+              headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(updateBody)
+          });
+          
+          const responseData = await response.json();
+
+          setUpdateResponse(responseData);
+      } catch (err) {
+          console.log(err);
+      } finally {
+          getMainData();
+      }
+  }
+  );
+  }
 
   return (
     <div style={{paddingTop: 120+'px'}}>
       <CssBaseline />
-      <EnhancedTable
-        columns={columns}
-        data={searchQuery 
-                ? selectValue === 'driver'
-                    || selectValue === 'way_list_number'
-                    || selectValue === 'number_of_tractor'
-                    || selectValue === 'number_of_installation'
-                    ? data.filter(x => x[selectValue].includes(searchQuery))
-                    : selectValue === 'date_of_away' || selectValue === 'date_of_come'
-                        ? data.filter(x => new Date(formatDate(x[selectValue])) >= new Date(searchQuery.from) && new Date(formatDate(x[selectValue])) <= new Date(searchQuery.to))
-                        : data.filter(x => Number(x[selectValue]) > searchQuery.from && Number(x[selectValue]) < searchQuery.to)
-                : data}
-        setData={setData}
-        updateMyData={updateMyData}
-        skipPageReset={skipPageReset}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectValue={selectValue}
-        setSelectValue={setSelectValue}
-      />
+      {
+        apiMessage.msg
+        ? (<EnhancedTable
+          columns={columns}
+          data={searchQuery 
+                  ? selectValue === 'driver'
+                      || selectValue === 'way_list_number'
+                      || selectValue === 'number_of_tractor'
+                      || selectValue === 'number_of_installation'
+                      ? (apiMessage.msg).filter(x => x[selectValue].includes(searchQuery))
+                      : selectValue === 'date_start' || selectValue === 'date_end'
+                          ? (apiMessage.msg).filter(x => new Date(formatDate(x[selectValue])) >= new Date(searchQuery.from) && new Date(formatDate(x[selectValue])) <= new Date(searchQuery.to))
+                          : (apiMessage.msg).filter(x => Number(x[selectValue]) > searchQuery.from && Number(x[selectValue]) < searchQuery.to)
+                  : apiMessage.msg}
+          setData={setApiMessage}
+          updateMyData={updateMyData}
+          skipPageReset={skipPageReset}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectValue={selectValue}
+          setSelectValue={setSelectValue}
+          formatDate={formatDate}
+          getMainData={getMainData}
+        />)
+        : (<div>загрузка...</div>)
+      }
+      <Snackbar
+        open={toast}
+        autoHideDuration={2000}
+        onClose={handleToastClose}
+      >
+          {
+            updateResponse.success
+            ? (<Alert onClose={handleToastClose} severity="success">
+                {updateResponse.msg}
+              </Alert>)
+            : (<Alert onClose={handleToastClose} severity="error">
+                {
+                  getError(updateResponse.msg)
+                }
+              </Alert>)
+          }
+      </Snackbar>
     </div>
   )
+}
+
+function formatDate(dateString) {
+  let dates = dateString.split('.');
+  return([dates[2], dates[1], dates[0]].join('-'));
+}
+
+const getError = errno => {
+  switch(errno) {
+    case 1366:
+      return 'В этой ячейке нельзя оставлять пустое поле';
+  }
 }
 
 export default App

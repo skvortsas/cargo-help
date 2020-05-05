@@ -80,7 +80,7 @@ const Expenses = (props) => {
         if (updateResponse.success === true) {
             handleClickVariant(updateResponse.msg ,'success');
         } else if(updateResponse.success === false) {
-            handleClickVariant(updateResponse.msg, 'error');
+            handleClickVariant(getError(updateResponse.msg), 'error');
         }
     }, [updateResponse]);
 
@@ -202,5 +202,16 @@ const formatDate = dateString => {
   let dates = dateString.split('.');
   return([dates[2], dates[1], dates[0]].join('-'));
 }
+
+const getError = errno => {
+    console.log(errno);
+    switch(errno) {
+      case 1265:
+      case 1292:
+        return 'В этой ячейке нельзя оставлять пустое поле';
+      case 1366:
+        return 'Неподходящее значение в ячейке';
+    }
+  }
 
 export default Expenses;

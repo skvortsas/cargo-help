@@ -21,15 +21,18 @@ function Alert(props) {
 const initialUser = {
   driver: '',
   way_list_number: 0,
+  way_list_year: 2000,
   number_of_tractor: 0,
   number_of_installation: 0,
-  speedometer_away: 0,
-  speedometer_come: 1,
+  speedometer_start: 0,
+  speedometer_end: 1,
+  date_start: '',
+  date_end: '',
   earned: 0,
   expenses: 0,
   fuel: 0,
-  medium_tractor_expenses: 0.1,
-  medium_installation_expenses: 0.1,
+  average_tractor_expenses: 0.1,
+  average_installation_expenses: 0.1,
   subRows: undefined,
 }
 
@@ -61,9 +64,9 @@ const AddUserDialog = props => {
   }
 
   const handleAdd = event => {
-    if (user.date_of_away && user.date_of_come) {
-        user.date_of_away = (new Date(user.date_of_away).toLocaleDateString());
-        user.date_of_come = (new Date(user.date_of_come).toLocaleDateString());
+    if (user.date_start && user.date_end) {
+        user.date_start = (new Date(user.date_start).toLocaleDateString());
+        user.date_end = (new Date(user.date_end).toLocaleDateString());
         addUserHandler(user)
         setUser(initialUser)
         switchState.addMultiple ? setOpen(true) : setOpen(false)
@@ -113,6 +116,14 @@ const AddUserDialog = props => {
           />
           <TextField
             margin="dense"
+            label="Год путевого листа"
+            type="number"
+            fullWidth
+            value={user.way_list_year}
+            onChange={handleChange('way_list_year')}
+          />
+          <TextField
+            margin="dense"
             label="Водитель"
             type="text"
             fullWidth
@@ -141,7 +152,7 @@ const AddUserDialog = props => {
             type="date"
             fullWidth
             value={user.date_of_away}
-            onChange={handleChange('date_of_away')}
+            onChange={handleChange('date_start')}
             InputLabelProps={{ shrink: true }}
           />
           <TextField
@@ -150,7 +161,7 @@ const AddUserDialog = props => {
             type="date"
             fullWidth
             value={user.date_of_come}
-            onChange={handleChange('date_of_come')}
+            onChange={handleChange('date_end')}
             InputLabelProps={{ shrink: true }}
           />
           <TextField
@@ -158,16 +169,16 @@ const AddUserDialog = props => {
             label="Спидометр выезд"
             type="number"
             fullWidth
-            value={user.speedometer_away}
-            onChange={handleChange('speedometer_away')}
+            value={user.speedometer_start}
+            onChange={handleChange('speedometer_start')}
           />
           <TextField
             margin="dense"
             label="Спидометр приезд"
             type="number"
             fullWidth
-            value={user.speedometer_come}
-            onChange={handleChange('speedometer_come')}
+            value={user.speedometer_end}
+            onChange={handleChange('speedometer_end')}
           />
           <TextField
             margin="dense"
@@ -198,16 +209,16 @@ const AddUserDialog = props => {
             label="Средний расход тягача"
             type="number"
             fullWidth
-            value={user.medium_tractor_expenses}
-            onChange={handleChange('medium_tractor_expenses')}
+            value={user.average_tractor_expenses}
+            onChange={handleChange('average_tractor_expenses')}
           />
           <TextField
             margin="dense"
             label="Средний расход инсталяции"
             type="number"
             fullWidth
-            value={user.medium_installation_expenses}
-            onChange={handleChange('medium_installation_expenses')}
+            value={user.average_installation_expenses}
+            onChange={handleChange('average_installation_expenses')}
           />
         </DialogContent>
         <DialogActions>

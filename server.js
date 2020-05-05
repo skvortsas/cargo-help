@@ -27,7 +27,7 @@ let expeditions = [];
 let fuel = [];
 let stops = [];
 let expenses = [];
-let userCreated = false;
+let main = [];
 
 // Accept cross-origin requests from the frontend app
 app.use(cors({ origin: 'http://localhost:3000' }));
@@ -260,7 +260,7 @@ app.put('/api/updateTruck', checkJwt, async (req, res) => {
     } catch(err) {
         console.log(err);
         return res.send({
-            msg: err,
+            msg: err.errno,
             success: false
         })
     } finally {
@@ -327,7 +327,7 @@ app.put('/api/updateExpeditions', checkJwt, async (req, res) => {
     } catch(err) {
         console.log(err);
         return res.send({
-            msg: err,
+            msg: err.errno,
             success: false
         })
     } finally {
@@ -350,7 +350,7 @@ app.post('/api/addExpedition', checkJwt, async (req, res) => {
                     + expedition + "', '"+ date +"', '"+ cargo +"', "+ cash +")");
     } catch(err) {
         res.send({
-            msg: err,
+            msg: err.errno,
             success: false
         })
     } finally {
@@ -399,7 +399,7 @@ app.put('/api/updateFuel', checkJwt, async (req, res) => {
     } catch(err) {
         console.log(err);
         return res.send({
-            msg: err,
+            msg: err.errno,
             success: false
         })
     } finally {
@@ -426,7 +426,7 @@ app.post('/api/addFuel', checkJwt, async (req, res) => {
                     + filled_indeed +")");
     } catch(err) {
         res.send({
-            msg: err,
+            msg: err.errno,
             success: false
         })
     } finally {
@@ -477,7 +477,7 @@ app.put('/api/updateStops', checkJwt, async (req, res) => {
     } catch(err) {
         console.log(err);
         return res.send({
-            msg: err,
+            msg: err.errno,
             success: false
         })
     } finally {
@@ -543,7 +543,7 @@ app.put('/api/updateExpenses', checkJwt, async (req, res) => {
     } catch(err) {
         console.log(err);
         return res.send({
-            msg: err,
+            msg: err.errno,
             success: false
         })
     } finally {
@@ -607,7 +607,7 @@ app.put('/api/updateMoneyFlow', checkJwt, async (req, res) => {
     } catch(err) {
         console.log(err);
         return res.send({
-            msg: err,
+            msg: err.errno,
             success: false
         })
     } finally {
@@ -641,22 +641,81 @@ app.post('/api/addMoneyFlow', checkJwt, async (req, res) => {
     }
 });
 
-app.post('/api/createUser', checkJwt, async (req, res) => {
-    userCreated = false;
-    const userName = req.body.userName;
+//main
+const fillMainTable = async data => {
+    for (let i = 0; i < data.length; i++) {
+        data[i].distance = data[i].speedometer_end - data[i].speedometer_start;
+        data[i].driver_salary = data[i].earned * 0.15;
+        data[i].income = data[i].earned - data[i].driver_salary - data[i].expenses - data[i].fuel;//not full formula
+    }
+}
+
+app.get('/api/getMain', checkJwt, async (req, res) => {
+    try {
+      const rows = await query('select * from main_table');
+      await setTwoDatesToLocal(rows);
+      await fillMainTable(rows);
+      main = await rows;
+    } catch(err) {
+      res.send({
+        msg: err
+    });
+    } finally {
+      res.send({
+        msg: main
+    });
+    }
+});
+
+//UPDATE
+app.put('/api/updateMain', checkJwt, async (req, res) => {
+    const newValue = req.body.value;
+    const column = req.body.column;
+    const id = req.body.id;
 
     try {
-        userName
-        ? await query("INSERT INTO `users`(`name`) VALUES ('"+ userName +"')")
-        : false;
+        await query("update `main_table` set `"+ column +"` = '" + newValue + "' where id =" + id);
     } catch(err) {
-        res.send({
-            msg: err
+        console.log(err);
+        return res.send({
+            msg: err.errno,
+            success: false
         })
     } finally {
-        userCreated = true;
+        return res.send({
+            msg: 'Успешно обновлено',
+            success: true
+        })
+    }
+});
+//POST
+app.post('/api/addMain', checkJwt, async (req, res) => {
+    const wayListNumber = req.body.number;
+    const wayListYear = req.body.year;
+    const { driver, number_of_tractor,
+            number_of_installation, date_start,
+            date_end, speedometer_start,
+            speedometer_end, average_tractor_expenses,
+            average_installation_expenses, earned,
+            expenses, fuel } = req.body;
+
+    try { 
+        await query("INSERT INTO `main_table` (way_list_number, way_list_year, driver,"
+                    +" number_of_tractor, number_of_installation, date_start, date_end, " 
+                    +"speedometer_start, speedometer_end, average_tractor_expenses, "
+                    +" average_installation_expenses, earned, expenses, fuel) VALUES ("+ wayListNumber +", "+ wayListYear +", '"
+                    + driver + "', "+ number_of_tractor +", "+ number_of_installation +", '"+ date_start +"', '"
+                    + date_end +"', "+ speedometer_start +", "+ speedometer_end +", "+ average_tractor_expenses +", "
+                    + average_installation_expenses +", "+ earned +", "+ expenses +", "+ fuel +")");
+    } catch(err) {
         res.send({
-            msg: userCreated
+            msg: err,
+            success: false
+        })
+    } finally {
+        res.send({
+            msg: 'Таблица удачно добавлена',
+            success:true
         })
     }
 });

@@ -8,11 +8,11 @@ const NavBar = ({ history }) => {
   const [page, setPage] = useState('');
 
   useEffect(() => {
-    setPage(history.location.pathname.split('/')[1]);
     window.onpopstate  = (e) => {
+      console.log(history.location.pathname.split('/')[1]);//idk, but this sht doesn't work without console.log(somethimes it doesn't highligt)
       setPage(history.location.pathname.split('/')[1]);
     }
-  }, []);
+  }, [history.location.pathname]);
 
   const switchPage = (event) => {
     setPage(event.target.id);

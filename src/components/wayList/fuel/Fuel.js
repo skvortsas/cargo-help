@@ -91,7 +91,7 @@ const Fuel = (props) => {
         if (updateResponse.success === true) {
             handleClickVariant(updateResponse.msg ,'success');
         } else if(updateResponse.success === false) {
-            handleClickVariant(updateResponse.msg, 'error');
+            handleClickVariant(getError(updateResponse.msg), 'error');
         }
     }, [updateResponse]);
 
@@ -225,5 +225,16 @@ const updateCountableCells = async old => {
         old[i].result = (old[i].tractor_filled - old[i].filled_indeed).toFixed(2);
     }
 }
+
+const getError = errno => {
+    console.log(errno);
+    switch(errno) {
+      case 1265:
+      case 1292:
+        return 'В этой ячейке нельзя оставлять пустое поле';
+      case 1366:
+        return 'Неподходящее значение в ячейке';
+    }
+  }
 
 export default Fuel;

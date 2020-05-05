@@ -141,7 +141,7 @@ const Truck = (props) => {
         if (updateResponse.success === true) {
             handleClickVariant(updateResponse.msg ,'success');
         } else if(updateResponse.success === false) {
-            handleClickVariant(updateResponse.msg, 'error');
+            handleClickVariant(getError(updateResponse.msg), 'error');
         }
     }, [updateResponse]);
 
@@ -307,5 +307,16 @@ const updateCountableCells = old => {
     old.instal_fuel_in_all = old.instal_fuel_in_all - old.instal_fuel_end + old.instal_fuel_start;
     old.instal_average_fuel_in_distance = (old.instal_fuel_in_all/old.instal_traveled_in_all).toFixed(2);
 }
+
+const getError = errno => {
+    console.log(errno);
+    switch(errno) {
+      case 1265:
+      case 1292:
+        return 'В этой ячейке нельзя оставлять пустое поле';
+      case 1366:
+        return 'Неподходящее значение в ячейке';
+    }
+  }
 
 export default Truck;
