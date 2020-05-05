@@ -75,6 +75,12 @@ const EditableCell = ({
     const onInputClick = e => {
         console.log('clicked on ', e.target.value);
     }
+
+    const inputEnterPressed = e => {
+        if (e.keyCode === 13) {
+            e.target.blur();
+        }
+    }
   
     // If the initialValue is changed externall, sync it up with our state
     React.useEffect(() => {
@@ -88,6 +94,7 @@ const EditableCell = ({
               value={value}
               onChange={onChange}
               onBlur={onBlur}
+              onKeyUp={inputEnterPressed}
             />)
             : (
               <div style={inputRowStyle}>

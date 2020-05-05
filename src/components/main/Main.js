@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import EnhancedTable from './EnhancedTable';
@@ -208,7 +209,9 @@ useEffect(() => {
           formatDate={formatDate}
           getMainData={getMainData}
         />)
-        : (<div>загрузка...</div>)
+          : (<div className='load-row'>
+            <CircularProgress className='load-circle' />
+          </div>)
       }
       <Snackbar
         open={toast}
@@ -216,15 +219,17 @@ useEffect(() => {
         onClose={handleToastClose}
       >
           {
-            updateResponse.success
+            updateResponse.success === true
             ? (<Alert onClose={handleToastClose} severity="success">
                 {updateResponse.msg}
               </Alert>)
-            : (<Alert onClose={handleToastClose} severity="error">
+            : updateResponse.success === false 
+            ? (<Alert onClose={handleToastClose} severity="error">
                 {
                   getError(updateResponse.msg)
                 }
               </Alert>)
+            : false
           }
       </Snackbar>
     </div>
@@ -237,9 +242,13 @@ function formatDate(dateString) {
 }
 
 const getError = errno => {
+  console.log(errno);
   switch(errno) {
-    case 1366:
+    case 1265:
+    case 1292:
       return 'В этой ячейке нельзя оставлять пустое поле';
+    case 1366:
+      return 'Неподходящее значение в ячейке';
   }
 }
 
