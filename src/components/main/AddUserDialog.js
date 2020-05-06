@@ -10,7 +10,7 @@ import IconButton from '@material-ui/core/IconButton'
 import PropTypes from 'prop-types'
 import Switch from '@material-ui/core/Switch'
 import TextField from '@material-ui/core/TextField'
-import Tooltip from '@material-ui/core/Tooltip'
+import Tooltip from '@material-ui/core/Tooltip';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 
@@ -222,7 +222,7 @@ const AddUserDialog = props => {
           />
         </DialogContent>
         <DialogActions>
-          <Tooltip title="Add multiple">
+          <Tooltip title="Добавить несколько">
             <Switch
               checked={switchState.addMultiple}
               onChange={handleSwitchChange('addMultiple')}

@@ -12,3 +12,18 @@
         height: 100px !important;
     }
 }
+
+.success {
+    color: rgb(0, 196, 0);
+}
+
+.error {
+    color: rgb(255, 0, 0);
+}
+
+.tooltip-description {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+}

@@ -21,6 +21,7 @@ let query = util.promisify(connection.query).bind(connection);
 
 let moneyFlow = [];
 let truck = [];
+// let truckInformation = [];
 let aditionalTruck = {};
 let truckExpenses = {};
 let expeditions = [];
@@ -650,11 +651,68 @@ const fillMainTable = async data => {
     }
 }
 
+const getTruckInfomation = async (number, year) => {
+    try {
+        const rows = await query("SELECT (speedometer_end - speedometer_start) as 'distance', "+
+        "ROUND((((select ROUND(sum(tractor_filled), 2) from `fuel` WHERE `way_list_number` = "+ number +" and `way_list_year` = "+ year +") +"+
+        "fuel_start - fuel_end)/(speedometer_end - speedometer_start) * 100), 2) as 'average_tractor_expenses', "+
+        "ROUND((((select ROUND(sum(installation_filled), 2) from `fuel` WHERE `way_list_number` = "+ number +" and `way_list_year` = "+ year +") +"+
+        "instal_fuel_start - instal_fuel_end)/(instal_speedometer_end-instal_speedometer_start)), 2) as 'average_installation_expenses',"+
+        "(select SUM(cash) from `expeditions` where `way_list_number` = "+ number +" and `way_list_year` = "+ year +") as 'earned',"+
+        "(select ROUND(SUM((SELECT SUM(cost) from `stops` where `way_list_number` = "+ number +" and `way_list_year` = "+ year +") +"+
+		"(SELECT SUM(cost) from `expenses` where `way_list_number` = "+ number +" and `way_list_year` = "+ year +") + "+
+        "(SELECT SUM(fuel_cost * (tractor_filled + installation_filled)) from `fuel` "+
+         "where `by_cash` > 0 and `way_list_number` = "+ number +" and `way_list_year` = "+ year +")), 2)) as 'expenses',"+
+         "(SELECT ROUND(SUM(fuel_cost * (tractor_filled + installation_filled)), 2) from `fuel` where `way_list_number` = "+ number +" and `way_list_year` = "+ year +") as 'fuel'"+
+        "FROM `truck` WHERE `way_list_number` = "+ number +" and `way_list_year` = "+ year);
+
+        return rows;
+    } catch (err) {
+        console.log('err',err);
+        return err;
+    }
+}
+
+const compareTables = async data => {
+    try {
+    for (let i = 0; i < data.length; i++) {
+        const tmpData = data[i];
+        const truckInformation = await getTruckInfomation(tmpData.way_list_number, tmpData.way_list_year);
+        if (truckInformation.length){
+        if (tmpData.distance === truckInformation[0].distance
+            && tmpData.average_tractor_expenses === truckInformation[0].average_tractor_expenses
+            && tmpData.average_installation_expenses === truckInformation[0].average_installation_expenses
+            && tmpData.earned === truckInformation[0].earned && tmpData.expenses === truckInformation[0].expenses
+            && tmpData.fuel === truckInformation[0].fuel) {
+                tmpData.compound = {
+                    success: true
+                };
+            }
+        else {
+            tmpData.compound = {
+                success: false,
+                mistakes: {
+                    distance: truckInformation[0].distance === tmpData.distance ? 'ok' : truckInformation[0].distance,
+                    average_tractor_expenses: truckInformation[0].average_tractor_expenses === tmpData.average_tractor_expenses ? 'ok' : truckInformation[0].average_tractor_expenses,
+                    average_installation_expenses: truckInformation[0].average_installation_expenses === tmpData.average_installation_expenses ? 'ok' : truckInformation[0].average_installation_expenses,
+                    earned: truckInformation[0].earned === tmpData.earned ? 'ok' : truckInformation[0].earned,
+                    expenses: truckInformation[0].expenses === tmpData.expenses ? 'ok' : truckInformation[0].expenses,
+                    fuel: truckInformation[0].fuel === tmpData.fuel ? 'ok' : truckInformation[0].fuel,
+                } 
+            };
+        }}
+    }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 app.get('/api/getMain', checkJwt, async (req, res) => {
     try {
       const rows = await query('select * from main_table');
       await setTwoDatesToLocal(rows);
       await fillMainTable(rows);
+      await compareTables(rows);
       main = await rows;
     } catch(err) {
       res.send({
@@ -674,7 +732,11 @@ app.put('/api/updateMain', checkJwt, async (req, res) => {
     const id = req.body.id;
 
     try {
-        await query("update `main_table` set `"+ column +"` = '" + newValue + "' where id =" + id);
+        if (column === 'speedometer_end') {
+            await query("update `main_table` set `"+ column +"` = '" + newValue + "', `speedometer_start` = 0 where id =" + id);
+        } else {
+            await query("update `main_table` set `"+ column +"` = '" + newValue + "' where id =" + id);
+        }
     } catch(err) {
         console.log(err);
         return res.send({

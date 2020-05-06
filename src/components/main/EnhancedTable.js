@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from "react-router-dom";
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import { useAuth0 } from "../../react-auth0-spa";
 
-import MaUTable from '@material-ui/core/Table'
-import PropTypes from 'prop-types'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableContainer from '@material-ui/core/TableContainer'
-import TableHead from '@material-ui/core/TableHead'
-import TablePagination from '@material-ui/core/TablePagination'
-import TablePaginationActions from './TablePaginationActions'
-import TableRow from '@material-ui/core/TableRow'
-import TableSortLabel from '@material-ui/core/TableSortLabel'
-import TableToolbar from './TableToolbar'
-import { makeStyles } from '@material-ui/core/styles'
-import EditIcon from '@material-ui/icons/Edit'
+import MaUTable from '@material-ui/core/Table';
+import PropTypes from 'prop-types';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TablePagination from '@material-ui/core/TablePagination';
+import TablePaginationActions from './TablePaginationActions';
+import TableRow from '@material-ui/core/TableRow';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import TableToolbar from './TableToolbar';
+import { makeStyles } from '@material-ui/core/styles';
+import EditIcon from '@material-ui/icons/Edit';
+import CheckIcon from '@material-ui/icons/Check';
+import ErrorTwoToneIcon from '@material-ui/icons/ErrorTwoTone';
+import Tooltip from '@material-ui/core/Tooltip';
 import {
   useGlobalFilter,
   usePagination,
@@ -26,6 +30,15 @@ import {
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
+
+const tooltipRows = [
+  'Расстояние',
+  'Ср. расход тягача',
+  'Ср. расход рефа',
+  'Заработано',
+  'Расходы',
+  'Топливо'
+]
 
 const spanStyle = {
   padding: 0,
@@ -54,7 +67,6 @@ const useTableStyles = makeStyles(theme => ({
     },
   }))
 
-// Create an editable cell renderer
 const EditableCell = ({
   value: initialValue,
   row: { index },
@@ -79,8 +91,13 @@ const EditableCell = ({
     updateMyData(index, id, value);
   }
 
+  const onBlurDistance = () => {
+    setEditable(false);
+    updateMyData(index, 'speedometer_end', value);
+  }
+
   const onInputClick = e => {
-      console.log('clicked on ', e.target.value);
+      console.log('clicked on ', e.target);
   }
 
   const inputOnEnterPressed = e => {
@@ -97,28 +114,90 @@ const EditableCell = ({
   return (
     
         editable
-        ? (<input
+        ? id === 'distance'
+          ? (
+          <input
+            value={value}
+            onChange={onChange}
+            onBlur={onBlurDistance}
+            onKeyUp={inputOnEnterPressed}
+          />)
+          : (<input
             value={value}
             onChange={onChange}
             onBlur={onBlur}
             onKeyUp={inputOnEnterPressed}
           />)
+        : id === 'compound'
+          ? (<div>
+              {
+                value && value.success === true
+                ? (
+                  <CheckIcon className='success' />
+                )
+                : value && value.success === false
+                  ? (
+                    <Tooltip title={
+                      <div>
+                        <p style={{fontSize: 14+'px'}}>Информация в доп. таблицах:</p>
+                        {
+                          (Object.entries(value.mistakes)).map((item, index) => (
+                          <p className='tooltip-description'>{tooltipRows[index]}{
+                            typeof(item[1]) === 'string'
+                            ? ''
+                            : ': '+item[1]
+                          }
+                            <span>{
+                                  typeof(item[1]) === 'string'
+                                  ? <CheckIcon className='success' />
+                                  : <ErrorTwoToneIcon className='error' />
+                                }
+                            </span>
+                          </p>
+                          ))
+                        }
+                      </div>
+                    }>
+                      <ErrorTwoToneIcon className='error' />
+                    </Tooltip>
+                  )
+                  : (
+                    <Tooltip title={
+                      <p style={{fontSize: 14+'px'}}>Не заполнены дополнительные таблицы</p>
+                    }>
+                      <ErrorTwoToneIcon className='error' />
+                    </Tooltip>
+                  )
+              }
+            </div>)
           : (
             <div style={inputRowStyle}>
                 {
                   id === 'car_parts' || id === 'wheels' || id === 'income'
-                  || id === 'driver_salary'
+                  || id === 'driver_salary' || id === 'compound'
                   ? ('')
                   : (<EditIcon 
                     style={editIconStyles}
                     onClick={onClick}/>)
                 }
-                <input
+                {
+                  id === 'distance' || id === 'average_fuel_tractor'
+                  || id === 'average_fuel_installation'
+                  ? (<Link to='way-list'>
+                    <input
                 style={spanStyle}
                 value={value}
                 onClick={onInputClick}
                 disabled
                 />
+                  </Link>)
+                  : <input
+                  style={spanStyle}
+                  value={value}
+                  onClick={onInputClick}
+                  disabled
+                  />
+                }
           </div>
           )
     

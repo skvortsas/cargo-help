@@ -16,6 +16,10 @@ const App = () => {
   const columns = React.useMemo(
     () => [
       {
+        Header: '',
+        accessor: 'compound',
+      },
+      {
         Header: '№ путевого',
         accessor: 'way_list_number',
       },
