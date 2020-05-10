@@ -21,7 +21,6 @@ let query = util.promisify(connection.query).bind(connection);
 
 let moneyFlow = [];
 let truck = [];
-// let truckInformation = [];
 let aditionalTruck = {};
 let truckExpenses = {};
 let expeditions = [];
@@ -29,6 +28,7 @@ let fuel = [];
 let stops = [];
 let expenses = [];
 let main = [];
+let wheels= [];
 
 // Accept cross-origin requests from the frontend app
 app.use(cors({ origin: 'http://localhost:3000' }));
@@ -769,6 +769,79 @@ app.post('/api/addMain', checkJwt, async (req, res) => {
                     + driver + "', "+ number_of_tractor +", "+ number_of_installation +", '"+ date_start +"', '"
                     + date_end +"', "+ speedometer_start +", "+ speedometer_end +", "+ average_tractor_expenses +", "
                     + average_installation_expenses +", "+ earned +", "+ expenses +", "+ fuel +")");
+    } catch(err) {
+        res.send({
+            msg: err,
+            success: false
+        })
+    } finally {
+        res.send({
+            msg: 'Таблица удачно добавлена',
+            success:true
+        })
+    }
+});
+
+//wheels
+const fillWheelsTable = async data => {
+    for (let i = 0; i < data.length; i++) {
+        data[i].to_tractor = data[i].to_tractor ? 'Тягач' : 'Реф';
+        data[i].is_wheel = data[i].is_wheel ? 'Колёса' : 'Не колёса'
+    }
+}
+//GET
+app.get('/api/getWheels', checkJwt, async (req, res) => {
+    const wayListYear = req.query.year
+    const wayListNumber = req.query.number;
+    try {
+      const rows = await query('select * from wheels where way_list_number =' + wayListNumber + ' and way_list_year =' + wayListYear);
+      await fillWheelsTable(rows);
+      await setDateToLocal(rows);
+      wheels = await rows;
+    } catch(err) {
+      res.send({
+        msg: err
+    });
+    } finally {
+      res.send({
+        msg: wheels
+    });
+    }
+});
+//UPDATE
+app.put('/api/updateWheels', checkJwt, async (req, res) => {
+    const newValue = req.body.value;
+    const column = req.body.column;
+    const id = req.body.id;
+
+    try {
+        await query("update `wheels` set `"+ column +"` = '" + newValue + "' where id =" + id);
+    } catch(err) {
+        console.log(err);
+        return res.send({
+            msg: err.errno,
+            success: false
+        })
+    } finally {
+        return res.send({
+            msg: 'Успешно обновлено',
+            success: true
+        })
+    }
+});
+//POST
+app.post('/api/addWheels', checkJwt, async (req, res) => {
+    const wayListNumber = req.body.number;
+    const wayListYear = req.body.year;
+    const { date, part_name,
+            amount, cost,
+            to_tractor, is_wheel,
+            comments } = req.body;
+
+    try { 
+        await query("INSERT INTO `wheels` (way_list_number, way_list_year, date,"
+                    +" part_name, amount, cost, to_tractor, is_wheel, comments) VALUES ("+ wayListNumber +", "+ wayListYear +", '"
+                    + date + "', '"+ part_name +"', "+ amount +", "+ cost +", "+ to_tractor +", "+ is_wheel +", '"+ comments +"')");
     } catch(err) {
         res.send({
             msg: err,

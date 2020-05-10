@@ -115,7 +115,7 @@ try {
 
 useEffect(() => {
   getMainData();
-});
+}, []);
 
 const toastOpen = () => {
   setToast(true);

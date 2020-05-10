@@ -69,7 +69,7 @@ const useTableStyles = makeStyles(theme => ({
 
 const EditableCell = ({
   value: initialValue,
-  row: { index },
+  row: { index, original },
   column: { id },
   updateMyData, // This is a custom function that we supplied to our table instance
 }) => {
@@ -181,17 +181,69 @@ const EditableCell = ({
                     onClick={onClick}/>)
                 }
                 {
-                  id === 'distance' || id === 'average_fuel_tractor'
-                  || id === 'average_fuel_installation'
-                  ? (<Link to='way-list'>
+                  id === 'distance' || id === 'average_tractor_expenses'
+                  || id === 'average_installation_expenses'
+                  ? (<Link to={{
+                    pathname: 'way-list',
+                    state: {
+                      redirectedNumber: original.way_list_number,
+                      redirectedYear: original.way_list_year
+                      }
+                    }}>
                     <input
-                style={spanStyle}
-                value={value}
-                onClick={onInputClick}
-                disabled
-                />
+                      style={spanStyle}
+                      value={value}
+                      onClick={onInputClick}
+                      disabled
+                    />
                   </Link>)
-                  : <input
+                  : id === 'earned'
+                    ? (<Link to={{
+                      pathname: 'way-list/expeditions',
+                      state: {
+                        redirectedNumber: original.way_list_number,
+                        redirectedYear: original.way_list_year
+                        }
+                      }}>
+                      <input
+                        style={spanStyle}
+                        value={value}
+                        onClick={onInputClick}
+                        disabled
+                      />
+                    </Link>)
+                      : id === 'expenses'
+                        ? (<Link to={{
+                          pathname: 'way-list/expenses',
+                          state: {
+                            redirectedNumber: original.way_list_number,
+                            redirectedYear: original.way_list_year
+                            }
+                          }}>
+                          <input
+                            style={spanStyle}
+                            value={value}
+                            onClick={onInputClick}
+                            disabled
+                          />
+                        </Link>)
+                        : id === 'fuel'
+                        ? (<Link to={{
+                          pathname: 'way-list/fuel',
+                          state: {
+                            redirectedNumber: original.way_list_number,
+                            redirectedYear: original.way_list_year
+                            }
+                          }}>
+                          <input
+                            style={spanStyle}
+                            value={value}
+                            onClick={onInputClick}
+                            disabled
+                          />
+                        </Link>)
+                        :
+                   <input
                   style={spanStyle}
                   value={value}
                   onClick={onInputClick}

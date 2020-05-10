@@ -1,0 +1,35 @@
+.wheels-select {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .wheels-input {
+        width: 180px;
+
+        &:first-of-type {
+            margin-right: 10px;
+        }
+    }
+}
+
+.wheels-detailed-card {
+    margin-left: 0;
+}
+
+.button-row-add-wheels {
+    display: flex;
+    justify-content: center;
+    background-color: #fafafa;
+
+    .button-add {
+        width: 370px;
+    }
+}
+
+#select-tractor-label {
+    margin-top: 10px;
+}
+
+#select-wheels-label {
+    margin-top: 10px;
+}

@@ -1,5 +1,5 @@
 // react things
-import React from "react";
+import React, { useState } from "react";
 import { Router, Route, Switch, Redirect } from "react-router-dom";
 // components
 import Profile from "./components/Profile";
@@ -23,7 +23,7 @@ function App() {
       <Router history={history}>
         {
           isAuthenticated
-          ? <NavBar history={history} />
+          ? <PrivateRoute path='' component={ NavBar } />
           : false
         }
         { 
@@ -35,9 +35,9 @@ function App() {
           <Route path="/" exact />
           <PrivateRoute exact path="/profile" component={ Profile } />
           <PrivateRoute exact path="/external-api" component={ ExternalApi } />
-          <PrivateRoute exact path='/main' component={ Main } />
-          <PrivateRoute path='/way-list' component={ WayList } />
-          <PrivateRoute path='/wheels' component={ Wheels } />
+          <PrivateRoute exact path='/main' component={Main} />
+          <PrivateRoute path='/way-list'component={WayList} />
+          <PrivateRoute path='/wheels' component={Wheels} />
         </Switch>
       </Router>
   );

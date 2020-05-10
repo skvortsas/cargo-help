@@ -20,7 +20,7 @@ import { AccountBalanceWallet } from '@material-ui/icons';
 import { LocalShipping } from '@material-ui/icons';
 import { SnackbarProvider } from 'notistack';
 
-const WayList = ({ match, history }) => {
+const WayList = ({ match, history, location }) => {
     const [chosenNumber, setChosenNumber] = useState('0');
     const [chosenYear, setChosenYear] = useState('1999');
     const [changingWayList, setChangingWayList] = useState(false);
@@ -38,7 +38,7 @@ const WayList = ({ match, history }) => {
     }
 
     const switchPage = event => {
-        setPage(event.target.parentNode.id)
+        setPage(event.target.parentNode.id);
     }
 
     useEffect(() => {
@@ -46,6 +46,20 @@ const WayList = ({ match, history }) => {
       setPage(history.location.pathname.split('/')[2]);
     }
     }, []);
+
+    useEffect(() => {
+        const number = document.getElementById('number');
+        const year = document.getElementById('year');
+
+        if (location.state) {
+            number.value = location.state.redirectedNumber;
+            year.value = location.state.redirectedYear;
+        }
+
+        if (location.pathname !== '/way-list') {
+            setPage(location.pathname.split('/')[2]);
+        }
+    }, [location]);
 
     useEffect(() => {
         const number = document.getElementById('number').value;
