@@ -29,6 +29,7 @@ let stops = [];
 let expenses = [];
 let main = [];
 let wheels= [];
+let carParts = {};
 
 // Accept cross-origin requests from the frontend app
 app.use(cors({ origin: 'http://localhost:3000' }));
@@ -643,11 +644,25 @@ app.post('/api/addMoneyFlow', checkJwt, async (req, res) => {
 });
 
 //main
-const fillMainTable = async data => {
+const fillMainTable = async (data, partsCost, wheelsCost) => {
     for (let i = 0; i < data.length; i++) {
+        partsCost.map((part) => {
+            if (part.way_list_number === data[i].way_list_number 
+                && part.way_list_year === data[i].way_list_year){
+                data[i].car_parts = part.parts_cost;
+            }
+        });
+        wheelsCost.map((part) => {
+            if (part.way_list_number === data[i].way_list_number
+                && part.way_list_year === data[i].way_list_year){
+                data[i].wheels = part.wheels_cost;
+            }
+        });
+        data[i].car_parts ? true : data[i].car_parts = 0;
+        data[i].wheels ? true : data[i].wheels = 0;
         data[i].distance = data[i].speedometer_end - data[i].speedometer_start;
         data[i].driver_salary = data[i].earned * 0.15;
-        data[i].income = data[i].earned - data[i].driver_salary - data[i].expenses - data[i].fuel;//not full formula
+        data[i].income = data[i].earned - data[i].driver_salary - data[i].expenses - data[i].car_parts - data[i].fuel;
     }
 }
 
@@ -707,11 +722,34 @@ const compareTables = async data => {
     }
 }
 
+const getCarPartsData = async () => {
+    try {
+        const rows = await query("select way_list_number, way_list_year, sum(cost) as 'parts_cost' from wheels"+ 
+                                " group by way_list_number, way_list_year");
+        return rows;
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+const getWheelsData = async () => {
+    try {
+        const rows = await query("select way_list_number, way_list_year, sum(cost) as 'wheels_cost' from wheels"+
+                                    " where is_wheel > 0"+
+                                    " group by way_list_number, way_list_year");
+        return rows;
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 app.get('/api/getMain', checkJwt, async (req, res) => {
     try {
       const rows = await query('select * from main_table');
       await setTwoDatesToLocal(rows);
-      await fillMainTable(rows);
+      const partsCost = await getCarPartsData();
+      const wheelsCost = await getWheelsData();
+      await fillMainTable(rows, partsCost, wheelsCost);
       await compareTables(rows);
       main = await rows;
     } catch(err) {

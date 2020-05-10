@@ -242,6 +242,21 @@ const EditableCell = ({
                             disabled
                           />
                         </Link>)
+                        : id === 'car_parts' || id === 'wheels'
+                        ? (<Link to={{
+                          pathname: 'wheels',
+                          state: {
+                            redirectedNumber: original.way_list_number,
+                            redirectedYear: original.way_list_year
+                            }
+                          }}>
+                          <input
+                            style={spanStyle}
+                            value={value}
+                            onClick={onInputClick}
+                            disabled
+                          />
+                        </Link>)
                         :
                    <input
                   style={spanStyle}
