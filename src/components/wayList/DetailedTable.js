@@ -11,6 +11,8 @@ import { useTable, useSortBy } from 'react-table';
 import { makeStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import DeleteDialog from '../main/DeleteDialog';
 
 const forbiddenToEditInputs = ['traveled_in_all', 'fuel_in_all', 'average_fuel_in_distance',
@@ -59,6 +61,7 @@ const EditableCell = ({
     // We need to keep and update the state of the cell normally
     const [value, setValue] = useState(initialValue);
     const [editable, setEditable] = useState(false);
+    const [openSelect, setOpenSelect] = useState(true);
   
     const onChange = e => {
       setValue(e.target.value)
@@ -83,6 +86,20 @@ const EditableCell = ({
             e.target.blur();
         }
     }
+
+    const handleCloseSelect = () => {
+        setOpenSelect(false);
+      }
+    
+    const handleOpenSelect = () => {
+        setOpenSelect(true);
+    }
+
+    const onSelectChange = e => {
+        let value = e.target.value;
+        setEditable(false);
+        updateMyData(index, id, value);
+    }
   
     // If the initialValue is changed externall, sync it up with our state
     useEffect(() => {
@@ -92,12 +109,42 @@ const EditableCell = ({
     return (
       
           editable
-          ? (<input
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              onKeyUp={inputEnterPressed}
-            />)
+          ? id === 'by_cash'
+            ? (<Select
+                open={openSelect}
+                onClose={handleCloseSelect}
+                onOpen={handleOpenSelect}
+                value={ value === 'Наличка' ? 1 : 0 }
+                onChange={onSelectChange}>
+                <MenuItem value={1}>За наличку</MenuItem>
+                <MenuItem value={0}>По карте</MenuItem>
+                </Select>)
+            : id === 'to_tractor'
+                ? (<Select
+                    open={openSelect}
+                    onClose={handleCloseSelect}
+                    onOpen={handleOpenSelect}
+                    value={ value === 'Тягач' ? 1 : 0 }
+                    onChange={onSelectChange}>
+                    <MenuItem value={1}>Тягач</MenuItem>
+                    <MenuItem value={0}>Реф</MenuItem>
+                    </Select>)
+                : id === 'is_wheel'
+                ? (<Select
+                    open={openSelect}
+                    onClose={handleCloseSelect}
+                    onOpen={handleOpenSelect}
+                    value={ value === 'Колёса' ? 1 : 0 }
+                    onChange={onSelectChange}>
+                    <MenuItem value={1}>Колёса</MenuItem>
+                    <MenuItem value={0}>Не Колёса</MenuItem>
+                    </Select>)
+                : (<input
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                onKeyUp={inputEnterPressed}
+                />)
             : id === 'delete'
             ? (<DeleteDialog 
                 id={original.id}

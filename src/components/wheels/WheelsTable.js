@@ -7,6 +7,7 @@ import DetailedTable from '../wayList/DetailedTable';
 import { useAuth0 } from "../../react-auth0-spa";
 import AddWheelsUnit from './AddWheelsUnit';
 import { dateCheck } from '../../inputChecks';
+import { VpnLock } from '@material-ui/icons';
 
 const WheelsTable = (props) => {
     const { enqueueSnackbar } = useSnackbar();
@@ -165,7 +166,16 @@ const WheelsTable = (props) => {
           } catch (err) {
               console.log(err);
           } finally {
-              old.msg[rowIndex][columnId] = value;
+            old.msg[rowIndex][columnId] = 
+                columnId === 'to_tractor' || columnId === 'is_wheel'
+                ? columnId === 'to_tractor'
+                    ? value > 0
+                        ? 'Тягач'
+                        : 'Реф'
+                    : value > 0
+                        ? 'Колёса'
+                        : 'Не колёса'
+                : value //just tried this way of assignment; usually I would make a function
               setApiMessage(old);
               return old;
           }

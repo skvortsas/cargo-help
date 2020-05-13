@@ -143,7 +143,7 @@ const Fuel = (props) => {
             old.msg.map((row, index) => {
                 if (index === rowIndex) {
                     id = old.msg[index].id;
-                    if(columnId === 'date') {
+                    if (columnId === 'date') {
                         newValue = dateCheck(newValue) ? formatDate(newValue) : null;
                     }
                 }
@@ -173,7 +173,11 @@ const Fuel = (props) => {
             } catch (err) {
                 console.log(err);
             } finally {
-                old.msg[rowIndex][columnId] = value;
+                columnId === 'by_cash' 
+                ? value > 0 
+                    ? old.msg[rowIndex][columnId] = 'Наличка' 
+                    : old.msg[rowIndex][columnId] = 'Безнал' 
+                : old.msg[rowIndex][columnId] = value;
                 await updateCountableCells(old.msg);
                 setApiMessage(old);
                 return old;

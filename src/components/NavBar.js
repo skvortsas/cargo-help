@@ -30,7 +30,7 @@ const NavBar = ({ location }) => {
             <Link
             id='wheels'
             className={page === 'wheels' ? 'current-page' : ''} 
-            to='/wheels'>Колеса</Link>
+            to='/wheels'>Запчасти</Link>
           </div>
           <button onClick={() => logout()}>Выйти</button>
         </div>
