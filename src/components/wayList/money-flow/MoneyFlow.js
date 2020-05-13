@@ -12,16 +12,19 @@ const MoneyFlow = (props) => {
     const { getTokenSilently } = useAuth0();
     const [ apiMessage, setApiMessage ] = React.useState({});
     const [ updateResponse, setUpdateResponse ] = React.useState({});
+    const [ deleteResponse, setDeleteResponse ] = React.useState({});
+    const [skipPageReset, setSkipPageReset] = React.useState(false);
 
     const handleClickVariant = (message ,variant) => {
-        if (variant === 'success') {
-            enqueueSnackbar(message, { variant });
-        } else if(variant === 'error') {
-            enqueueSnackbar(message, { variant });
-        }
+        enqueueSnackbar(message, { variant });
     };
+
     const columns = React.useMemo(
         () => [
+          {
+            Header: '',
+            accessor: 'delete'
+          },
             {
                 Header: 'Дата',
                 accessor: 'date'
@@ -83,7 +86,40 @@ const MoneyFlow = (props) => {
       }
   }, [updateResponse]);
 
-    const [skipPageReset, setSkipPageReset] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof(deleteResponse.success) === 'boolean') {
+        deleteResponse.success
+        ? handleClickVariant(deleteResponse.msg ,'success')
+        : handleClickVariant(deleteResponse.msg ,'error')
+    }
+  }, [deleteResponse]);
+
+    const deleteUnitHandler = async unit => {
+        const deleteBody = {
+          "id": unit.id
+      }
+    
+        try {
+            const token = await getTokenSilently();
+    
+            const response = await fetch('http://localhost:3001/api/deleteMoneyFlow', {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(deleteBody)
+            });
+    
+            const responseData = await response.json();
+            setDeleteResponse(responseData);
+        } catch (err) {
+            console.log(err);
+        } finally {
+          getMoneyFlowData();
+        }
+      }
+
 
     const updateMyData = (rowIndex, columnId, value) => {
       // We also turn on the flag to not reset the page
@@ -185,6 +221,7 @@ const MoneyFlow = (props) => {
                     columns={columns}
                     data={apiMessage.msg}
                     updateMyData={updateMyData}
+                    deleteUnitHandler={deleteUnitHandler}
                     skipPageReset={skipPageReset} />)
                     : (
                       <div style={{display: 'flex', justifyContent: 'center'}}>

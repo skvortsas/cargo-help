@@ -11,11 +11,12 @@ import { useTable, useSortBy } from 'react-table';
 import { makeStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
+import DeleteDialog from '../main/DeleteDialog';
 
 const forbiddenToEditInputs = ['traveled_in_all', 'fuel_in_all', 'average_fuel_in_distance',
                                 'instal_traveled_in_all', 'instal_fuel_in_all', 'instal_average_fuel_in_distance',
                                 'truck_recieved', 'truck_delivered', 'daily_money', 'truck_expenses', 'truck_result',
-                                'cost_in_all', 'result', 'day_amount'];
+                                'cost_in_all', 'result', 'day_amount', 'delete'];
 
 const useTableStyles = makeStyles(theme => ({
     container: {
@@ -49,9 +50,10 @@ const cashedFuel = {
 // Create an editable cell renderer
 const EditableCell = ({
     value: initialValue,
-    row: { index },
+    row: { index, original },
     column: { id },
-    updateMyData, // This is a custom function that we supplied to our table instance
+    updateMyData,
+    deleteUnitHandler
   }) => {
 
     // We need to keep and update the state of the cell normally
@@ -83,9 +85,9 @@ const EditableCell = ({
     }
   
     // If the initialValue is changed externall, sync it up with our state
-    React.useEffect(() => {
+    useEffect(() => {
       setValue(initialValue)
-    }, [initialValue])
+    }, [initialValue]);
   
     return (
       
@@ -96,6 +98,10 @@ const EditableCell = ({
               onBlur={onBlur}
               onKeyUp={inputEnterPressed}
             />)
+            : id === 'delete'
+            ? (<DeleteDialog 
+                id={original.id}
+                deleteUnitHandler={deleteUnitHandler}/>)
             : (
               <div style={inputRowStyle}>
                   {
@@ -138,6 +144,7 @@ const EditableCell = ({
         columns,
         data,
         updateMyData,
+        deleteUnitHandler,
         skipPageReset,
   }) => {
     const classes = useTableStyles();
@@ -158,6 +165,7 @@ const EditableCell = ({
         // That way we can call this function from our
         // cell renderer!
         updateMyData,
+        deleteUnitHandler
       }, useSortBy);
 
       return(

@@ -299,6 +299,24 @@ app.post('/api/addTruck', checkJwt, async (req, res) => {
         })
     }
 });
+//DELETE
+app.delete('/api/deleteTruck', checkJwt, async (req, res) => {
+    const id = req.body.id;
+    try {
+        await query("delete from truck where id=" + id);
+    } catch (err) {
+        console.log(err);
+        res.send({
+            msg: err,
+            success: false
+        });
+    } finally {
+        res.send({
+            msg: 'Информация успешно удалена',
+            success: true
+        });
+    }
+});
 
 //way-list/expeditions
 app.get('/api/getExpeditions', checkJwt, async (req, res) => {
@@ -360,6 +378,24 @@ app.post('/api/addExpedition', checkJwt, async (req, res) => {
             msg: 'Таблица удачно добавлена',
             success:true
         })
+    }
+});
+//DELETE
+app.delete('/api/deleteExpedition', checkJwt, async (req, res) => {
+    const id = req.body.id;
+    try {
+        await query("delete from expeditions where id=" + id);
+    } catch (err) {
+        console.log(err);
+        res.send({
+            msg: err,
+            success: false
+        });
+    } finally {
+        res.send({
+            msg: 'Строка успешно удалена',
+            success: true
+        });
     }
 });
 
@@ -436,6 +472,24 @@ app.post('/api/addFuel', checkJwt, async (req, res) => {
             msg: 'Таблица удачно добавлена',
             success:true
         })
+    }
+});
+//DELETE
+app.delete('/api/deleteFuel', checkJwt, async (req, res) => {
+    const id = req.body.id;
+    try {
+        await query("delete from fuel where id=" + id);
+    } catch (err) {
+        console.log(err);
+        res.send({
+            msg: err,
+            success: false
+        });
+    } finally {
+        res.send({
+            msg: 'Строка успешно удалена',
+            success: true
+        });
     }
 });
 
@@ -515,6 +569,24 @@ app.post('/api/addStop', checkJwt, async (req, res) => {
         })
     }
 });
+//DELETE
+app.delete('/api/deleteStop', checkJwt, async (req, res) => {
+    const id = req.body.id;
+    try {
+        await query("delete from stops where id=" + id);
+    } catch (err) {
+        console.log(err);
+        res.send({
+            msg: err,
+            success: false
+        });
+    } finally {
+        res.send({
+            msg: 'Строка успешно удалена',
+            success: true
+        });
+    }
+});
 
 //way-list/expenses
 app.get('/api/getExpenses', checkJwt, async (req, res) => {
@@ -579,6 +651,24 @@ app.post('/api/addExpense', checkJwt, async (req, res) => {
         })
     }
 });
+//DELETE
+app.delete('/api/deleteExpense', checkJwt, async (req, res) => {
+    const id = req.body.id;
+    try {
+        await query("delete from expenses where id=" + id);
+    } catch (err) {
+        console.log(err);
+        res.send({
+            msg: err,
+            success: false
+        });
+    } finally {
+        res.send({
+            msg: 'Строка успешно удалена',
+            success: true
+        });
+    }
+});
 
 //way-list/money-flow
 app.get('/api/getMoneyFlow', checkJwt, async (req, res) => {
@@ -640,6 +730,24 @@ app.post('/api/addMoneyFlow', checkJwt, async (req, res) => {
             msg: 'Таблица удачно добавлена',
             success:true
         })
+    }
+});
+//DELETE
+app.delete('/api/deleteMoneyFlow', checkJwt, async (req, res) => {
+    const id = req.body.id;
+    try {
+        await query("delete from money_flow where id=" + id);
+    } catch (err) {
+        console.log(err);
+        res.send({
+            msg: err,
+            success: false
+        });
+    } finally {
+        res.send({
+            msg: 'Строка успешно удалена',
+            success: true
+        });
     }
 });
 
@@ -814,9 +922,27 @@ app.post('/api/addMain', checkJwt, async (req, res) => {
         })
     } finally {
         res.send({
-            msg: 'Таблица удачно добавлена',
+            msg: 'Строка удачно добавлена',
             success:true
         })
+    }
+});
+//DELETE
+app.delete('/api/deleteMain', checkJwt, async (req, res) => {
+    const id = req.body.id;
+    try {
+        await query("delete from main_table where id=" + id);
+    } catch (err) {
+        console.log(err);
+        res.send({
+            msg: err,
+            success: false
+        });
+    } finally {
+        res.send({
+            msg: 'Строка успешно удалена',
+            success: true
+        });
     }
 });
 
@@ -890,6 +1016,24 @@ app.post('/api/addWheels', checkJwt, async (req, res) => {
             msg: 'Таблица удачно добавлена',
             success:true
         })
+    }
+});
+//DELETE
+app.delete('/api/deleteWheel', checkJwt, async (req, res) => {
+    const id = req.body.id;
+    try {
+        await query("delete from wheels where id=" + id);
+    } catch (err) {
+        console.log(err);
+        res.send({
+            msg: err,
+            success: false
+        });
+    } finally {
+        res.send({
+            msg: 'Строка успешно удалена',
+            success: true
+        });
     }
 });
 

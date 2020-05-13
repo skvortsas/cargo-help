@@ -7,6 +7,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import EnhancedTable from './EnhancedTable';
 import { useAuth0 } from "../../react-auth0-spa";
 import '../styles/main.scss';
+import { dateCheck } from '../../inputChecks';
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -18,6 +19,10 @@ const App = () => {
       {
         Header: '',
         accessor: 'compound',
+      },
+      {
+        Header: '',
+        accessor: 'delete'
       },
       {
         Header: '№ путевого',
@@ -106,6 +111,7 @@ try {
   });
 
   const responseData = await response.json();
+
 
   setApiMessage(responseData);
 } catch (error) {

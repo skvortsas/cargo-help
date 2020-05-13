@@ -19,6 +19,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
 import CheckIcon from '@material-ui/icons/Check';
 import ErrorTwoToneIcon from '@material-ui/icons/ErrorTwoTone';
+import DeleteDialog from './DeleteDialog';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
   useGlobalFilter,
@@ -71,11 +72,14 @@ const EditableCell = ({
   value: initialValue,
   row: { index, original },
   column: { id },
-  updateMyData, // This is a custom function that we supplied to our table instance
+  updateMyData,
+  getMainData,
+  setChangeResponse
 }) => {
-  // We need to keep and update the state of the cell normally
   const [value, setValue] = useState(initialValue);
   const [editable, setEditable] = useState(false);
+  const [deleteResponse, setDeleteResponse] = useState({});
+  const { getTokenSilently } = useAuth0();
 
   const onChange = e => {
     setValue(e.target.value)
@@ -85,7 +89,6 @@ const EditableCell = ({
       setEditable(true);
   }
 
-  // We'll only update the external data when the input is blurred
   const onBlur = () => {
     setEditable(false);
     updateMyData(index, id, value);
@@ -106,10 +109,42 @@ const EditableCell = ({
     }
   }
 
+  const deleteUnitHandler = async unit => {
+    const deleteBody = {
+      "id": unit.id
+  }
+
+    try {
+        const token = await getTokenSilently();
+
+        const response = await fetch('http://localhost:3001/api/deleteMain', {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(deleteBody)
+        });
+
+        const responseData = await response.json();
+        setDeleteResponse(responseData);
+    } catch (err) {
+        console.log(err);
+    } finally {
+      getMainData();
+    }
+  }
+
   // If the initialValue is changed externall, sync it up with our state
-  React.useEffect(() => {
+  useEffect(() => {
     setValue(initialValue)
-  }, [initialValue])
+  }, [initialValue]);
+
+  useEffect(() => {
+    if (typeof(deleteResponse.success) === 'boolean') {
+      setChangeResponse(deleteResponse);
+    }
+  }, [deleteResponse]);
 
   return (
     
@@ -170,11 +205,18 @@ const EditableCell = ({
                   )
               }
             </div>)
+          : id === 'delete'
+          ? (
+            <DeleteDialog
+              id={original.id}
+              deleteUnitHandler={deleteUnitHandler}/>
+          )
           : (
             <div style={inputRowStyle}>
                 {
                   id === 'car_parts' || id === 'wheels' || id === 'income'
                   || id === 'driver_salary' || id === 'compound'
+                  || id === 'delete'
                   ? ('')
                   : (<EditIcon 
                     style={editIconStyles}
@@ -305,7 +347,7 @@ const EnhancedTable = ({
 }) => {
   const classes = useTableStyles();
   const [toast, setToast] = useState(false);
-  const [addResponse, setAddResponse] = useState({});
+  const [changeResponse, setChangeResponse] = useState({});
   const { getTokenSilently } = useAuth0();
 
   const toastOpen = () => {
@@ -321,10 +363,10 @@ const EnhancedTable = ({
   };
 
   useEffect(() => {
-    if(addResponse.success) {
+    if(typeof(changeResponse.success) === 'boolean') {
       toastOpen();
     }
-  }, [addResponse]);
+  }, [changeResponse]);
 
   const {
     getTableProps,
@@ -347,6 +389,9 @@ const EnhancedTable = ({
       // That way we can call this function from our
       // cell renderer!
       updateMyData,
+      getMainData,
+      setChangeResponse,
+      toastOpen,
     },
     useGlobalFilter,
     useSortBy,
@@ -360,6 +405,7 @@ const EnhancedTable = ({
   const handleChangeRowsPerPage = event => {
     setPageSize(Number(event.target.value))
   }
+
   const addUserHandler = async user => {
     const postBody = {
         "number": user.way_list_number,
@@ -392,7 +438,7 @@ const EnhancedTable = ({
 
             const responseData = await response.json();
 
-            setAddResponse(responseData);
+            setChangeResponse(responseData);
     } catch (err) {
         console.log(err);
     } finally {
@@ -480,9 +526,9 @@ const EnhancedTable = ({
         autoHideDuration={2000}
         onClose={handleToastClose}
       >
-          <Alert onClose={handleToastClose} severity={addResponse.success ? "success" : "error"}>
+          <Alert onClose={handleToastClose} severity={changeResponse.success ? "success" : "error"}>
           {
-            addResponse.success ? "Успешно обновлено" : "Произошла ошибка"
+            changeResponse.msg
           }
         </Alert>
       </Snackbar>
