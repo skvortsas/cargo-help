@@ -20,19 +20,26 @@ import { AccountBalanceWallet } from '@material-ui/icons';
 import { LocalShipping } from '@material-ui/icons';
 import { SnackbarProvider } from 'notistack';
 
-const WayList = ({ match, history, location }) => {
-    const [chosenNumber, setChosenNumber] = useState('0');
-    const [chosenYear, setChosenYear] = useState('1999');
+const WayList = ({ match, history, location, wayList, setWayList }) => {
+    const [chosenNumber, setChosenNumber] = useState(wayList.number);
+    const [chosenYear, setChosenYear] = useState(wayList.year);
     const [changingWayList, setChangingWayList] = useState(false);
     const [page, setPage] = useState('');
 
-    const setWayList = () => {
+    const setThisWayList = () => {
+        const number = document.getElementById('number');
+        const year = document.getElementById('year');
+        
+        setWayList({
+            "number": number.value,
+            "year": year.value
+        });
         setChangingWayList(true);
     }
 
     const inputEnterPressed = event => {
         if (event.keyCode === 13) {
-            setWayList();
+            setThisWayList();
             event.target.blur();
         }
     }
@@ -54,6 +61,9 @@ const WayList = ({ match, history, location }) => {
         if (location.state) {
             number.value = location.state.redirectedNumber;
             year.value = location.state.redirectedYear;
+        } else if (wayList.number !== '0' && wayList.year !== '1999') {
+            number.value = Number(wayList.number);
+            year.value = Number(wayList.year); // если не обернуть в number, то label не поднимется вверх
         }
 
         if (location.pathname !== '/way-list') {
@@ -125,7 +135,7 @@ const WayList = ({ match, history, location }) => {
             id='year'/>
             </div>
             <div className='button-row'>
-                <Button onClick={setWayList}><Search /></Button>
+                <Button onClick={setThisWayList}><Search /></Button>
             </div>
         </FormControl>
         </div>

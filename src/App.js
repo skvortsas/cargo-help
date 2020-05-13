@@ -18,6 +18,14 @@ import { useAuth0 } from "./react-auth0-spa";
 
 function App() {
   const { isAuthenticated } = useAuth0();
+  const [chosenWayList, setChosenWayList] = useState({
+                                                      number: '0',
+                                                      year: '1999'  
+                                                      });
+  const [chosenWheel, setChosenWheel] = useState({
+                                                number: '0',
+                                                year: '1999'  
+                                                });
 
   return (
       <Router history={history}>
@@ -36,8 +44,8 @@ function App() {
           <PrivateRoute exact path="/profile" component={ Profile } />
           <PrivateRoute exact path="/external-api" component={ ExternalApi } />
           <PrivateRoute exact path='/main' component={Main} />
-          <PrivateRoute path='/way-list'component={WayList} />
-          <PrivateRoute path='/wheels' component={Wheels} />
+          <PrivateRoute path='/way-list' wayList={chosenWayList} setWayList={setChosenWayList} component={WayList} />
+          <PrivateRoute exact path='/wheels' wayList={chosenWheel} setWayList={setChosenWheel} component={Wheels} />
         </Switch>
       </Router>
   );
