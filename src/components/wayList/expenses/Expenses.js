@@ -6,6 +6,7 @@ import { useSnackbar } from 'notistack';
 import DetailedTable from '../DetailedTable';
 import { useAuth0 } from "../../../react-auth0-spa";
 import AddExpensesUnit from './AddExpensesUnit';
+import { dateCheck } from '../../../inputChecks';
 
 const Expenses = (props) => {
     const { enqueueSnackbar } = useSnackbar();
@@ -132,7 +133,9 @@ const Expenses = (props) => {
           old.msg.map((row, index) => {
               if (index === rowIndex) {
                   id = old.msg[index].id;
-                  newValue = columnId === 'date' ? formatDate(newValue) : newValue;
+                  if(columnId === 'date') {
+                    newValue = dateCheck(newValue) ? formatDate(newValue) : null;
+                }
               }
           })
 
@@ -244,7 +247,7 @@ const getError = errno => {
     switch(errno) {
       case 1265:
       case 1292:
-        return 'В этой ячейке нельзя оставлять пустое поле';
+        return 'Неверный ввод';
       case 1366:
         return 'Неподходящее значение в ячейке';
     }

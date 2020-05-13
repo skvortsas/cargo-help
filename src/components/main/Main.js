@@ -158,8 +158,10 @@ useEffect(() => {
       old.msg.map((row, index) => {
         if (index === rowIndex) {
             id = old.msg[index].id;
-            newValue = columnId === 'date_start'
-            || columnId === 'date_end' ? formatDate(newValue) : newValue;
+            if (columnId === 'date_start'
+                || columnId === 'date_end'){
+                  newValue = dateCheck(newValue) ? newValue = formatDate(newValue) : null;
+                }
         }
     })
 
@@ -256,7 +258,7 @@ const getError = errno => {
   switch(errno) {
     case 1265:
     case 1292:
-      return 'В этой ячейке нельзя оставлять пустое поле';
+      return 'Неправильный ввод';
     case 1366:
       return 'Неподходящее значение в ячейке';
   }
