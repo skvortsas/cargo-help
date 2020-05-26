@@ -1,0 +1,61 @@
+.statistic-cards {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    padding: 0 10px;
+
+    .card {
+        margin: 0 10px 10px 0;
+        padding: 0 10px 10px;
+        min-width: 350px;
+
+        .card-header {
+            text-align: center;
+        }
+
+        .card-sub-header {
+            text-align: center;
+
+        }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .row-left {
+            display: flex;
+        }
+    }
+
+    .chart-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+        width: 100%;
+
+        & > * {
+            width: 45%;
+            margin: 0 10px 10px 0;
+
+            @media screen and (max-width: 1024px) {
+                width: 100%;
+            }
+        }
+
+        .chart-select-row {
+            display: flex;
+            justify-content: space-evenly;     
+            padding-bottom: 5px;
+            
+            .button-row {
+                display: flex;
+                align-items: flex-end;
+            }
+
+            .header-select {
+                text-align: center;
+            }
+        }
+    }
+}

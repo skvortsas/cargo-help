@@ -249,7 +249,7 @@ const EditableCell = ({
                                         {
                                             row.cells.map(cell => (
                                                 <TableCell {...cell.getCellProps()}
-                                                style={cell.row.original.by_cash === 'Наличка' 
+                                                style={(cell.row.original.by_cash === 'Наличка' && cell.row.original.amount === undefined) 
                                                         || cell.row.original.is_wheel === 'Колёса' 
                                                         ? cashedFuel : {}}>
                                                     { cell.render('Cell') }

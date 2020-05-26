@@ -7,14 +7,13 @@ import DetailedTable from '../wayList/DetailedTable';
 import { useAuth0 } from "../../react-auth0-spa";
 import AddWheelsUnit from './AddWheelsUnit';
 import { dateCheck } from '../../inputChecks';
-import { VpnLock } from '@material-ui/icons';
 
 const WheelsTable = (props) => {
     const { enqueueSnackbar } = useSnackbar();
     const { getTokenSilently } = useAuth0();
     const [ apiMessage, setApiMessage ] = React.useState({});
     const [ updateResponse, setUpdateResponse ] = React.useState({});
-    const [skipPageReset, setSkipPageReset] = React.useState(false);
+    const [ skipPageReset, setSkipPageReset ] = React.useState(false);
     const [ deleteResponse, setDeleteResponse ] = React.useState({});
 
     const handleClickVariant = (message ,variant) => {
@@ -36,6 +35,10 @@ const WheelsTable = (props) => {
                 accessor: 'part_name'
             },
             {
+                Header: 'Марка',
+                accessor: 'mark'
+            },
+            {
                 Header: 'Количество',
                 accessor: 'amount'
             },
@@ -50,6 +53,10 @@ const WheelsTable = (props) => {
             {
                 Header: 'Колеса',
                 accessor: 'is_wheel'
+            },
+            {
+                Header: 'Наличка/Безнал',
+                accessor: 'by_cash'
             },
             {
                 Header: 'Комментарии',
@@ -167,14 +174,19 @@ const WheelsTable = (props) => {
               console.log(err);
           } finally {
             old.msg[rowIndex][columnId] = 
-                columnId === 'to_tractor' || columnId === 'is_wheel'
+                columnId === 'to_tractor' || columnId === 'is_wheel' || columnId === 'by_cash'
                 ? columnId === 'to_tractor'
                     ? value > 0
                         ? 'Тягач'
                         : 'Реф'
-                    : value > 0
-                        ? 'Колёса'
-                        : 'Не колёса'
+                    : columnId === 'is_wheel'
+                        ?  value > 0
+                            ? 'Колёса'
+                            : 'Не колёса'
+                        : value > 0
+                            ? 'Наличка'
+                            : 'Безнал'
+
                 : value //just tried this way of assignment; usually I would make a function
               setApiMessage(old);
               return old;

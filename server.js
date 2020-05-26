@@ -29,7 +29,9 @@ let stops = [];
 let expenses = [];
 let main = [];
 let wheels= [];
-let carParts = {};
+let driverStatistics = [];
+let popularParts = [];
+let tractorParts = [];
 
 // Accept cross-origin requests from the frontend app
 app.use(cors({ origin: 'http://localhost:3000' }));
@@ -950,7 +952,8 @@ app.delete('/api/deleteMain', checkJwt, async (req, res) => {
 const fillWheelsTable = async data => {
     for (let i = 0; i < data.length; i++) {
         data[i].to_tractor = data[i].to_tractor ? 'Тягач' : 'Реф';
-        data[i].is_wheel = data[i].is_wheel ? 'Колёса' : 'Не колёса'
+        data[i].is_wheel = data[i].is_wheel ? 'Колёса' : 'Не колёса';
+        data[i].by_cash = data[i].by_cash ? 'Наличка': 'Безнал';
     }
 }
 //GET
@@ -1033,6 +1036,68 @@ app.delete('/api/deleteWheel', checkJwt, async (req, res) => {
         res.send({
             msg: 'Строка успешно удалена',
             success: true
+        });
+    }
+});
+
+//Statistics
+//main
+app.get('/api/driverStatistics', checkJwt, async (req, res) => {
+    try {
+        const rows = await query("SELECT driver, count(driver) as 'count', sum(average_tractor_expenses) as 'average_tractor_expenses', "+
+        "sum(fuel) as 'fuel', sum(speedometer_end - speedometer_start) as 'distance' "+
+        "FROM `main_table` "+
+        "GROUP BY driver");
+        driverStatistics = await rows;
+    } catch (err) {
+        console.log(err);
+        res.send({
+            msg: err
+        });
+    } finally {
+        res.send({
+            msg: driverStatistics
+        });
+    }
+});
+//wheels
+app.get('/api/popularParts', checkJwt, async (req, res) => {
+    try {
+        const rows = await query("select part_name, sum(cost) as 'sum' "+
+                                    "from wheels "+
+                                    "group by part_name "+
+                                    "order by sum desc");
+        popularParts = await rows;
+    } catch(err) {
+        console.log(err);
+        res.send({
+            msg: err
+        });
+    } finally {
+        res.send({
+            msg: popularParts
+        });
+    }
+});
+//tractor wheels
+app.get('/api/tractorParts', checkJwt, async (req, res) => {
+    try {
+        const rows = await query("select main_table.number_of_tractor, sum(wheels.cost * wheels.amount) as 'sum' " +
+                                "from main_table "+
+                                "join wheels on main_table.way_list_number = wheels.way_list_number "+
+                                "and main_table.way_list_year = wheels.way_list_year "+
+                                "where wheels.to_tractor > 0 "+
+                                "group by main_table.number_of_tractor "+
+                                "order by sum desc");
+        tractorParts = await rows;
+    } catch(err) {
+        console.log(err);
+        res.send({
+            msg: tractorParts
+        });
+    } finally {
+        res.send({
+            msg: tractorParts
         });
     }
 });

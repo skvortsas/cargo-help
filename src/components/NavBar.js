@@ -5,7 +5,7 @@ import './styles/navBar.scss';
 
 const NavBar = ({ location }) => {
   const { isAuthenticated, logout } = useAuth0();
-  const [page, setPage] = useState('');
+  const [page, setPage] = useState('main');
 
   useEffect(() => {
     setPage(location.pathname.split('/')[1]);
@@ -19,6 +19,10 @@ const NavBar = ({ location }) => {
       {isAuthenticated && (
         <div className='navBar'>
           <div className='links'>
+          <Link
+              id='statistics'
+              className={page === 'statistics' ? 'current-page' : ''} 
+              to="/statistics">Статистика</Link>
             <Link
               id='main'
               className={page === 'main' ? 'current-page' : ''} 
@@ -31,8 +35,8 @@ const NavBar = ({ location }) => {
             id='wheels'
             className={page === 'wheels' ? 'current-page' : ''} 
             to='/wheels'>Запчасти</Link>
+            <button onClick={() => logout()}>Выйти</button>
           </div>
-          <button onClick={() => logout()}>Выйти</button>
         </div>
       )}
     </div>
