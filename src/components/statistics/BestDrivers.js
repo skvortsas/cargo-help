@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import { useAuth0 } from "../../react-auth0-spa";
 
 const BestDrivers = () => {
@@ -10,6 +12,7 @@ const BestDrivers = () => {
 
     useEffect(() => {
         getDriverStatistics(getTokenSilently, setDriverStatistics);
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -30,8 +33,8 @@ const BestDrivers = () => {
             {
                 driverStatistics.msg
                 ? (
-                    bestDrivers.map(item => (
-                        <div className='card-row'>
+                    bestDrivers.map((item, index) => (
+                        <div key={index} className='card-row'>
                             <div className='row-left'>
                                 { item.driver }
                             </div>
@@ -44,7 +47,11 @@ const BestDrivers = () => {
                         </div>
                     ))
                 )
-                : 'loading...'
+                : (
+                    <div className='load-row'>
+                        <CircularProgress />
+                    </div>
+                )
             }
             <div className='card-sub-header'>
                 <h4>Самые транжирные</h4>
@@ -52,8 +59,8 @@ const BestDrivers = () => {
             {
                 driverStatistics.msg
                 ? (
-                    worstDrivers.map(item => (
-                        <div className='card-row'>
+                    worstDrivers.map((item, index) => (
+                        <div key={index} className='card-row'>
                             <div className='row-left'>
                                 { item.driver }
                             </div>
@@ -65,7 +72,11 @@ const BestDrivers = () => {
                         </div>
                     ))
                 )
-                : 'loading...'
+                : (
+                    <div className='load-row'>
+                        <CircularProgress />
+                    </div>
+                )
             }
         </div>
     );

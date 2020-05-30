@@ -121,6 +121,7 @@ try {
 
 useEffect(() => {
   getMainData();
+  // eslint-disable-next-line
 }, []);
 
 const toastOpen = () => {
@@ -163,6 +164,7 @@ useEffect(() => {
                   newValue = dateCheck(newValue) ? newValue = formatDate(newValue) : null;
                 }
         }
+        return row;
     })
 
       const updateBody = {
@@ -188,7 +190,7 @@ useEffect(() => {
       } catch (err) {
           console.log(err);
       } finally {
-          getMainData();
+          return getMainData();
       }
   }
   );
@@ -203,13 +205,14 @@ useEffect(() => {
           columns={columns}
           data={searchQuery 
                   ? selectValue === 'driver'
-                      || selectValue === 'way_list_number'
+                      ? (apiMessage.msg).filter(x => x[selectValue].includes(searchQuery))
+                      : selectValue === 'way_list_number'
                       || selectValue === 'number_of_tractor'
                       || selectValue === 'number_of_installation'
-                      ? (apiMessage.msg).filter(x => x[selectValue].includes(searchQuery))
-                      : selectValue === 'date_start' || selectValue === 'date_end'
-                          ? (apiMessage.msg).filter(x => new Date(formatDate(x[selectValue])) >= new Date(searchQuery.from) && new Date(formatDate(x[selectValue])) <= new Date(searchQuery.to))
-                          : (apiMessage.msg).filter(x => Number(x[selectValue]) > searchQuery.from && Number(x[selectValue]) < searchQuery.to)
+                      ? (apiMessage.msg).filter(x => String(x[selectValue]).includes(searchQuery))
+                        : selectValue === 'date_start' || selectValue === 'date_end'
+                            ? (apiMessage.msg).filter(x => new Date(formatDate(x[selectValue])) >= new Date(searchQuery.from) && new Date(formatDate(x[selectValue])) <= new Date(searchQuery.to))
+                            : (apiMessage.msg).filter(x => Number(x[selectValue]) > searchQuery.from && Number(x[selectValue]) < searchQuery.to)
                   : apiMessage.msg}
           setData={setApiMessage}
           updateMyData={updateMyData}
@@ -261,6 +264,8 @@ const getError = errno => {
       return 'Неправильный ввод';
     case 1366:
       return 'Неподходящее значение в ячейке';
+    default:
+      return 'Неизвестная ошибка'
   }
 }
 

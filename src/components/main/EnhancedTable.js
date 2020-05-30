@@ -144,6 +144,7 @@ const EditableCell = ({
     if (typeof(deleteResponse.success) === 'boolean') {
       setChangeResponse(deleteResponse);
     }
+    // eslint-disable-next-line
   }, [deleteResponse]);
 
   return (

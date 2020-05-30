@@ -43,6 +43,7 @@ const Wheels = ({ location, wayList, setWayList }) => {
             number.value = Number(wayList.number);
             year.value = Number(wayList.year); // если не обернуть в number, то label не поднимется вверх
         }
+        // eslint-disable-next-line
     }, [location]);
 
     useEffect(() => {

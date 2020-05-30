@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import { useAuth0 } from "../../react-auth0-spa";
 
 const BestWayList = () => {
@@ -10,6 +12,7 @@ const BestWayList = () => {
 
     useEffect(() => {
         getMainData(getTokenSilently, setApiMessage);
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -31,8 +34,8 @@ const BestWayList = () => {
             {
                 apiMessage.msg
                 ? (
-                    mostMoney.map(item => (
-                        <div className='card-row'>
+                    mostMoney.map((item, index) => (
+                        <div key={index} className='card-row'>
                             <div className='row-left'>
                                 <div style={{ width: 30+'px' }}>
                                     {item.way_list_number}
@@ -47,7 +50,11 @@ const BestWayList = () => {
                         </div>
                     ))
                 )
-                : 'loading...'
+                : (
+                    <div className='load-row'>
+                        <CircularProgress />
+                    </div>
+                )
             }
             <div className='card-sub-header'>
                 <h4>Самые выгодные</h4>
@@ -55,8 +62,8 @@ const BestWayList = () => {
             {
                 apiMessage.msg
                 ? (
-                    mostProfitable.map(item => (
-                        <div className='card-row'>
+                    mostProfitable.map((item, index) => (
+                        <div key={index} className='card-row'>
                             <div className='row-left'>
                                 <div style={{ width: 30+'px' }}>
                                     {item.way_list_number}
@@ -71,7 +78,11 @@ const BestWayList = () => {
                         </div>
                     ))
                 )
-                : 'loading...'
+                : (
+                    <div className='load-row'>
+                        <CircularProgress />
+                    </div>
+                )
             }
         </div>
     );

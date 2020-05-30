@@ -49,9 +49,10 @@ const WayList = ({ match, history, location, wayList, setWayList }) => {
     }
 
     useEffect(() => {
-    window.onpopstate  = (e) => {
+    window.onpopstate  = () => {
       setPage(history.location.pathname.split('/')[2]);
     }
+    // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -69,6 +70,7 @@ const WayList = ({ match, history, location, wayList, setWayList }) => {
         if (location.pathname !== '/way-list') {
             setPage(location.pathname.split('/')[2]);
         }
+        // eslint-disable-next-line
     }, [location]);
 
     useEffect(() => {

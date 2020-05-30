@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth0 } from "../../react-auth0-spa";
+import React, { useState } from 'react';
 
 import DeleteIcon from '@material-ui/icons/DeleteForever';
 import Button from '@material-ui/core/Button';

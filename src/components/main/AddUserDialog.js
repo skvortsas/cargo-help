@@ -151,7 +151,7 @@ const AddUserDialog = props => {
             label="Дата выезда"
             type="date"
             fullWidth
-            value={user.date_of_away}
+            value={user.date_start}
             onChange={handleChange('date_start')}
             InputLabelProps={{ shrink: true }}
           />
@@ -160,7 +160,7 @@ const AddUserDialog = props => {
             label="Дата приезда"
             type="date"
             fullWidth
-            value={user.date_of_come}
+            value={user.date_end}
             onChange={handleChange('date_end')}
             InputLabelProps={{ shrink: true }}
           />

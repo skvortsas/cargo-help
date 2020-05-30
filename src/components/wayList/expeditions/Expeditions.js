@@ -68,6 +68,7 @@ const Expeditions = (props) => {
 
     React.useEffect(() => {
         getExpeditionsData();
+        // eslint-disable-next-line
     }, []);
 
     React.useEffect(() => {
@@ -76,6 +77,7 @@ const Expeditions = (props) => {
         } else if(updateResponse.success === false) {
             handleClickVariant(getError(updateResponse.msg), 'error');
         }
+        // eslint-disable-next-line
     }, [updateResponse]);
 
     React.useEffect(() => {
@@ -84,6 +86,7 @@ const Expeditions = (props) => {
             ? handleClickVariant(deleteResponse.msg ,'success')
             : handleClickVariant(deleteResponse.msg ,'error')
         }
+        // eslint-disable-next-line
       }, [deleteResponse]);
     
         const deleteUnitHandler = async unit => {
@@ -127,6 +130,7 @@ const Expeditions = (props) => {
                         newValue = dateCheck(newValue) ? formatDate(newValue) : null;
                     }
                 }
+                return row;
             })
 
             const updateBody = {
@@ -239,6 +243,8 @@ const getError = errno => {
         return 'Неверный ввод';
       case 1366:
         return 'Неподходящее значение в ячейке';
+      default:
+        return 'Неизвестная ошибка';
     }
   }
 

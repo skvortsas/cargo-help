@@ -117,8 +117,8 @@ const TableToolbar = props => {
                 label='Поиск'
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)} />)
-            : selectValue === 'date_of_away'
-                || selectValue === 'date_of_come'
+            : selectValue === 'date_start'
+                || selectValue === 'date_end'
             ? (
                 <div>
                 <TextField

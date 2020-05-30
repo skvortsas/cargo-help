@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import { useAuth0 } from "../../react-auth0-spa";
 
 const MostExpensiveDrivers = () => {
@@ -11,18 +13,21 @@ const MostExpensiveDrivers = () => {
     useEffect(() => {
         getPopularParts(getTokenSilently, setPopularParts);
         getPopularTractor(getTokenSilently, setPopularTractor);
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
         if (popularParts.msg) {
             getThree(popularParts.msg, setPopularParts, 'parts');
         }
+        // eslint-disable-next-line
     }, [popularParts]);
 
     useEffect(() => {
         if (popularTractor.msg) {
             getThree(popularTractor.msg, setPopularTractor, 'tractor');
         }
+        // eslint-disable-next-line
     }, [popularTractor]);
 
     const getThree = async (items, setItems, itemName) => {
@@ -45,8 +50,8 @@ const MostExpensiveDrivers = () => {
             {
                 readyPage.parts
                 ? (
-                    (popularParts.msg).map(item => (
-                        <div className='card-row'>
+                    (popularParts.msg).map((item, index) => (
+                        <div key={index} className='card-row'>
                             <div className='row-left'>
                                 { item.part_name }
                             </div>
@@ -56,7 +61,11 @@ const MostExpensiveDrivers = () => {
                         </div>
                     ))
                 )
-                : 'loading...'
+                : (
+                    <div className='load-row'>
+                        <CircularProgress />
+                    </div>
+                )
             }
             <div className='card-sub-header'>
                 <h4>Самые ломающиеся тягачи</h4>
@@ -64,8 +73,8 @@ const MostExpensiveDrivers = () => {
             {
                 readyPage.tractor
                 ? (
-                    (popularTractor.msg).map(item => (
-                        <div className='card-row'>
+                    (popularTractor.msg).map((item, index) => (
+                        <div key={index} className='card-row'>
                             <div className='row-left'>
                                 { item.number_of_tractor }
                             </div>
@@ -75,7 +84,11 @@ const MostExpensiveDrivers = () => {
                         </div>
                     ))
                 )
-                : 'loading...'
+                : (
+                    <div className='load-row'>
+                        <CircularProgress />
+                    </div>
+                )
             }
         </div>
     );

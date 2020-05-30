@@ -4,6 +4,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import {
   ArgumentAxis,
@@ -13,7 +14,7 @@ import {
   Tooltip,
   Title
 } from '@devexpress/dx-react-chart-material-ui';
-import { ValueScale, Animation } from '@devexpress/dx-react-chart';
+import { Animation } from '@devexpress/dx-react-chart';
 import { EventTracker } from '@devexpress/dx-react-chart';
 
 import { useAuth0 } from "../../react-auth0-spa";
@@ -36,6 +37,7 @@ const Profit = () => {
 
     useEffect(() => {
         getMainData(getTokenSilently, setMainData);
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -50,6 +52,7 @@ const Profit = () => {
         } else if(mainData.length !== 0) {
             getProfitData();
         }
+        // eslint-disable-next-line
     }, [mainData.msg]);
 
     useEffect(() => {
@@ -62,6 +65,7 @@ const Profit = () => {
             setChartData(tmpData);
             setShow(true);
         } 
+        // eslint-disable-next-line
     }, [readyToShow]);
 
     useEffect(() => {
@@ -69,17 +73,8 @@ const Profit = () => {
             pushSelectData();
             setReadyToShow(true);
         }
+        // eslint-disable-next-line
     }, [chartData]);
-
-    const setMediana = async data => {
-        let tmpData = [...data];
-
-        for (let i = 0; i < tmpData.length; i++) {
-            tmpData[i].mediana = (data.reduce(sum, 0) / tmpData.length).toFixed(2)
-        }
-
-        setChartData(tmpData);
-    }
 
     const pushSelectData = () => {
         const monthFrom = Number(chartData[0].month.split('.')[0]);
@@ -125,12 +120,10 @@ const Profit = () => {
                     profit: mainData[i].income
                 });
             } else {
-                let item = profitData.find(item => {
-                    if (item.year === mainData[i].start_year 
-                        && item.month === mainData[i].start_month) {
-                            return item
-                        }
-                });
+                let item = profitData.find(item => (
+                    item.year === mainData[i].start_year 
+                        && item.month === mainData[i].start_month
+                ));
                 tmpData[tmpData.indexOf(item)].profit += mainData[i].income;
             }
         }
@@ -214,8 +207,8 @@ const Profit = () => {
                                         value={chosenYearFrom}
                                         onChange={changeYearFrom}>
                                             {
-                                                years.map((item) => (
-                                                    <MenuItem value={item}>{item}</MenuItem>
+                                                years.map((item, index) => (
+                                                    <MenuItem key={index} value={item}>{item}</MenuItem>
                                                 ))
                                             }
                                         </Select>
@@ -224,7 +217,7 @@ const Profit = () => {
                                         onChange={changeMonthFrom}>
                                             {
                                                 months.map((item, index) => (
-                                                    <MenuItem value={index}>{item}</MenuItem>
+                                                    <MenuItem key={index} value={index}>{item}</MenuItem>
                                                 ))
                                             }
                                         </Select>
@@ -239,8 +232,8 @@ const Profit = () => {
                                         value={chosenYearTo}
                                         onChange={changeYearTo}>
                                             {
-                                                years.map((item) => (
-                                                    <MenuItem value={item}>{item}</MenuItem>
+                                                years.map((item, index) => (
+                                                    <MenuItem key={index} value={item}>{item}</MenuItem>
                                                 ))
                                             }
                                         </Select>
@@ -249,7 +242,7 @@ const Profit = () => {
                                         onChange={changeMonthTo}>
                                             {
                                                 months.map((item, index) => (
-                                                    <MenuItem value={index}>{item}</MenuItem>
+                                                    <MenuItem key={index} value={index}>{item}</MenuItem>
                                                 ))
                                             }
                                         </Select>
@@ -263,7 +256,11 @@ const Profit = () => {
                             </div>
                         </div>
                         )
-                    : 'loading...'
+                    : (
+                        <div className='load-row'>
+                            <CircularProgress />
+                        </div>
+                    )
                 }
             </Paper>
         </div>
