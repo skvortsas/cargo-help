@@ -197,7 +197,7 @@ useEffect(() => {
   }
 
   return (
-    <div style={{paddingTop: 120+'px'}}>
+    <div style={{paddingTop: 100+'px'}}>
       <CssBaseline />
       {
         apiMessage.msg

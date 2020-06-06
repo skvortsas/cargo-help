@@ -97,7 +97,7 @@ const TableToolbar = props => {
                 <em>Пусто</em>
             </MenuItem>
             {columns.map(column => (
-                <MenuItem value={column.accessor}>
+                <MenuItem key={column.accessor} value={column.accessor}>
                     {column.Header}
                 </MenuItem>
             ))}
@@ -179,11 +179,7 @@ const TableToolbar = props => {
 }
 
 TableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
   addUserHandler: PropTypes.func.isRequired,
-  deleteUserHandler: PropTypes.func.isRequired,
-  setGlobalFilter: PropTypes.func.isRequired,
-  globalFilter: PropTypes.string.isRequired,
   columns: PropTypes.array.isRequired,
   searchQuery: PropTypes.string.isRequired,
   setSearchQuery: PropTypes.func.isRequired,

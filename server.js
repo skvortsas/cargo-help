@@ -754,7 +754,7 @@ app.delete('/api/deleteMoneyFlow', checkJwt, async (req, res) => {
 });
 
 //main
-const fillMainTable = async (data, partsCost, wheelsCost) => {
+const fillMainTable = async (data, partsCost, wheelsCost, moneyToHold, earnedMoneyData) => {
     for (let i = 0; i < data.length; i++) {
         partsCost.map((part) => {
             if (part.way_list_number === data[i].way_list_number 
@@ -768,11 +768,28 @@ const fillMainTable = async (data, partsCost, wheelsCost) => {
                 data[i].wheels = part.wheels_cost;
             }
         });
+        moneyToHold.map((row) => {
+            if (row.way_list_number === data[i].way_list_number
+                && row.way_list_year === data[i].way_list_year) {
+                    data[i].hold = row.hold;
+                } else {
+                    data[i].hold = 0;
+                }
+        });
+        earnedMoneyData.map((row) => {
+            if (row.way_list_number === data[i].way_list_number
+                && row.way_list_year === data[i].way_list_year) {
+                    data[i].earned_indeed = row.earned_indeed;
+                } else {
+                    data[i].earned_indeed = data[i].earned;
+                }
+        });
+
         data[i].car_parts ? true : data[i].car_parts = 0;
         data[i].wheels ? true : data[i].wheels = 0;
         data[i].distance = data[i].speedometer_end - data[i].speedometer_start;
-        data[i].driver_salary = data[i].earned * 0.15;
-        data[i].income = (data[i].earned - data[i].driver_salary - data[i].expenses - data[i].car_parts - data[i].fuel).toFixed(2);
+        data[i].driver_salary = data[i].earned * 0.15 - data[i].hold;
+        data[i].income = (data[i].earned_indeed - data[i].driver_salary - data[i].expenses - data[i].car_parts - data[i].fuel).toFixed(2);
     }
 }
 
@@ -853,13 +870,34 @@ const getWheelsData = async () => {
     }
 }
 
+const getMoneyToHold = async () => {
+    try {
+        const rows = await query("SELECT way_list_number, way_list_year, hold FROM `truck`");
+        return rows;
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+const getEarnedMoneyData = async () => {
+    try {
+        const rows = await query("SELECT way_list_number, way_list_year, sum(earned_indeed) as `earned_indeed` FROM `expeditions` "+
+                                "GROUP BY way_list_number, way_list_year");
+        return rows;
+    } catch(err) {
+        console.log(err);
+    }
+}
+
 app.get('/api/getMain', checkJwt, async (req, res) => {
     try {
       const rows = await query('select * from main_table order by id desc');
       await setTwoDatesToLocal(rows);
       const partsCost = await getCarPartsData();
       const wheelsCost = await getWheelsData();
-      await fillMainTable(rows, partsCost, wheelsCost);
+      const moneyToHold = await getMoneyToHold();
+      const earnedMoneyData = await getEarnedMoneyData();
+      await fillMainTable(rows, partsCost, wheelsCost, moneyToHold, earnedMoneyData);
       await compareTables(rows);
       main = await rows;
     } catch(err) {

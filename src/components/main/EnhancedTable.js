@@ -34,7 +34,7 @@ const LinkedInput = styled.input`
   cursor: pointer
 `
 
-function Alert(props) {
+const Alert = (props) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
@@ -70,7 +70,7 @@ const useTableStyles = makeStyles(theme => ({
         width: 100+'%',
     },
     container: {
-        maxHeight: 65+'vh',
+        maxHeight: 60+'vh',
     },
   }))
 
@@ -184,7 +184,7 @@ const EditableCell = ({
                         <p style={{fontSize: 14+'px'}}>Информация в доп. таблицах:</p>
                         {
                           (Object.entries(value.mistakes)).map((item, index) => (
-                          <p className='tooltip-description'>{tooltipRows[index]}{
+                          <p key={ index } className='tooltip-description'>{tooltipRows[index]}{
                             typeof(item[1]) === 'string'
                             ? ''
                             : ': '+item[1]
@@ -323,13 +323,13 @@ const EditableCell = ({
 
 EditableCell.propTypes = {
   cell: PropTypes.shape({
-    value: PropTypes.any.isRequired,
+    // value: PropTypes.any.isRequired,
   }),
   row: PropTypes.shape({
     index: PropTypes.number.isRequired,
   }),
   column: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
   }),
   updateMyData: PropTypes.func.isRequired,
 }
@@ -535,10 +535,8 @@ const EnhancedTable = ({
         onClose={handleToastClose}
       >
           <Alert onClose={handleToastClose} severity={changeResponse.success ? "success" : "error"}>
-          {
-            changeResponse.msg
-          }
-        </Alert>
+            { changeResponse.msg }
+          </Alert>
       </Snackbar>
       </>
   )
