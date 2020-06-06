@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, createRef } from 'react';
 
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
@@ -32,10 +32,10 @@ const AddStopsUnitDialog = props => {
   const [unit, setUnit] = useState(initialUnit)
   const { addUnitHandler } = props
   const [open, setOpen] = useState(false)
-
   const [switchState, setSwitchState] = useState({
     addMultiple: false,
   });
+  const firstInput = createRef();
 
   const handleSwitchChange = name => event => {
     setSwitchState({ ...switchState, [name]: event.target.checked })
@@ -56,6 +56,7 @@ const AddStopsUnitDialog = props => {
 
   const handleAdd = event => {
     if (unit.date_start && unit.date_end) {
+        firstInput.current.children[1].children[0].focus(); // input of textField using materialUi
         unit.date_start = (new Date(unit.date_start).toLocaleDateString());
         unit.date_end = (new Date(unit.date_end).toLocaleDateString());
         addUnitHandler(unit)
@@ -104,6 +105,7 @@ const AddStopsUnitDialog = props => {
         <DialogContent>
           <TextField
             autoFocus
+            ref={  firstInput }
             margin="dense"
             label="Местонахождение"
             type="text"

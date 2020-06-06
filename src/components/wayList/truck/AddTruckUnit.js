@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, createRef } from 'react';
 
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
@@ -25,10 +25,10 @@ const AddTruckUnitDialog = props => {
   const [unit, setUnit] = useState(initialUnit);
   const { addUnitHandler } = props;
   const [open, setOpen] = useState(false);
-
   const [switchState, setSwitchState] = useState({
     addMultiple: false,
   });
+  const firstInput = createRef();
 
   const resetSwitch = () => {
     setSwitchState({ addMultiple: false });
@@ -44,6 +44,7 @@ const AddTruckUnitDialog = props => {
   }
 
   const handleAdd = event => {
+    firstInput.current.children[1].children[0].focus(); // input of textField using materialUi
     addUnitHandler(unit);
     setUnit(initialUnit);
     switchState.addMultiple ? setOpen(true) : setOpen(false);
@@ -75,6 +76,7 @@ const AddTruckUnitDialog = props => {
         <DialogContent>
           <TextField
             autoFocus
+            ref={ firstInput }
             margin="dense"
             label="Спидометер при выезде"
             type="number"

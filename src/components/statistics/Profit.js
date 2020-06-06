@@ -76,6 +76,16 @@ const Profit = () => {
         // eslint-disable-next-line
     }, [chartData]);
 
+    useEffect(() => {
+        if (profitData.length) {
+            getYears(profitData, setYears);
+
+            doubleSort(profitData);
+            renameMonths(profitData);
+            pushInitChartData(profitData, setChartData);
+        }
+    }, [profitData]);
+
     const pushSelectData = () => {
         const monthFrom = Number(chartData[0].month.split('.')[0]);
         const monthTo = Number(chartData[chartData.length - 1].month.split('.')[0])
@@ -85,14 +95,12 @@ const Profit = () => {
         setChosenMonthTo(monthTo - 1);
     }
 
-    const renameMonths = async (data, setData) => {
-        let tmpData = [...data];
-        for (let i = 0; i < tmpData.length; i++) {
-            tmpData[i].month = tmpData[i].month < 10 
-                                ? ('0' + String(tmpData[i].month + 1) + '.' + String(tmpData[i].year)) 
-                                : (String(tmpData[i].month + 1) + '.' + String(tmpData[i].year));
+    const renameMonths = async (data) => {
+        for (let i = 0; i < data.length; i++) {
+            data[i].month = data[i].month < 10 
+                                ? ('0' + String(data[i].month + 1) + '.' + String(data[i].year)) 
+                                : (String(data[i].month + 1) + '.' + String(data[i].year));
         }
-        setData(tmpData);
     }
 
     const pushInitChartData = (data, setData) => {
@@ -106,10 +114,10 @@ const Profit = () => {
     }
 
     const getProfitData = async () => {
-        let tmpData = profitData;
+        let tmpData = [...profitData];
 
         for (let i = 0; i < mainData.length; i++) {
-            if (!profitData.some(item => (
+            if (!tmpData.some(item => (
                 item.year === mainData[i].start_year
                 && item.month === mainData[i].start_month
             ))) {
@@ -117,23 +125,18 @@ const Profit = () => {
                 tmpData.push({
                     year: mainData[i].start_year,
                     month: mainData[i].start_month,
-                    profit: mainData[i].income
+                    profit: Number(mainData[i].income)
                 });
             } else {
-                let item = profitData.find(item => (
+                let item = tmpData.find(item => (
                     item.year === mainData[i].start_year 
                         && item.month === mainData[i].start_month
                 ));
-                tmpData[tmpData.indexOf(item)].profit += mainData[i].income;
+                tmpData[tmpData.indexOf(item)].profit += Number(mainData[i].income);
             }
         }
 
         setProfitData(tmpData);
-        getYears(profitData, setYears);
-
-        await doubleSort(profitData);
-        await renameMonths(profitData, setProfitData);
-        pushInitChartData(profitData, setChartData);
     }
 
     const buildChart = async () => {
@@ -282,7 +285,7 @@ const doubleSort = async data => {
 }
 
 const getChartDates = async (mainData, setMainData) => {
-    let tmpData = mainData;
+    let tmpData = [...mainData];
 
     for (let i = 0; i < tmpData.length; i++) {
         tmpData[i].start_month = new Date(formatDate(tmpData[i].date_start)).getMonth();

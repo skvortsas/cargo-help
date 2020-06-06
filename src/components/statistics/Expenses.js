@@ -77,6 +77,16 @@ const Expenses = () => {
         // eslint-disable-next-line
     }, [chartData]);
 
+    useEffect(() => {
+        if (expensesData.length) {
+            getYears(expensesData, setYears);
+
+            doubleSort(expensesData);
+            renameMonths(expensesData);
+            pushInitChartData(expensesData, setChartData);
+        }
+    }, [expensesData]);
+
     const pushSelectData = () => {
         const monthFrom = Number(chartData[0].month.split('.')[0]);
         const monthTo = Number(chartData[chartData.length - 1].month.split('.')[0])
@@ -86,14 +96,12 @@ const Expenses = () => {
         setChosenMonthTo(monthTo - 1);
     }
 
-    const renameMonths = async (data, setData) => {
-        let tmpData = [...data];
-        for (let i = 0; i < tmpData.length; i++) {
-            tmpData[i].month = tmpData[i].month < 10 
-                                ? ('0' + String(tmpData[i].month + 1) + '.' + String(tmpData[i].year)) 
-                                : (String(tmpData[i].month + 1) + '.' + String(tmpData[i].year));
+    const renameMonths = async (data) => {
+        for (let i = 0; i < data.length; i++) {
+            data[i].month = data[i].month < 10 
+                                ? ('0' + String(data[i].month + 1) + '.' + String(data[i].year)) 
+                                : (String(data[i].month + 1) + '.' + String(data[i].year));
         }
-        setData(tmpData);
     }
 
     const pushInitChartData = (data, setData) => {
@@ -107,10 +115,10 @@ const Expenses = () => {
     }
 
     const getExpensesData = async () => {
-        let tmpData = expensesData;
+        let tmpData = [...expensesData];
 
         for (let i = 0; i < mainData.length; i++) {
-            if (!expensesData.some(item => (
+            if (!tmpData.some(item => (
                 item.year === mainData[i].start_year
                 && item.month === mainData[i].start_month
             ))) {
@@ -119,23 +127,18 @@ const Expenses = () => {
                 tmpData.push({
                     year: mainData[i].start_year,
                     month: mainData[i].start_month,
-                    expenses: expenses
+                    expenses: Number(expenses)
                 });
             } else {
-                let item = expensesData.find(item => (
+                let item = tmpData.find(item => (
                     item.year === mainData[i].start_year 
                         && item.month === mainData[i].start_month
                 ));
-                tmpData[tmpData.indexOf(item)].expenses += mainData[i].expenses + mainData[i].fuel + mainData[i].car_parts + mainData[i].driver_salary;
+                tmpData[tmpData.indexOf(item)].expenses += Number(mainData[i].expenses + mainData[i].fuel + mainData[i].car_parts + mainData[i].driver_salary);
             }
         }
 
         setExpensesData(tmpData);
-        getYears(expensesData, setYears);
-
-        await doubleSort(expensesData);
-        await renameMonths(expensesData, setExpensesData);
-        pushInitChartData(expensesData, setChartData);
     }
 
     const buildChart = async () => {

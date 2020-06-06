@@ -13,7 +13,7 @@ const app = express();
 const connection = mysql.createConnection({
     host: 'remotemysql.com',
     user: 'WaxbmNDvnO',
-    password: 'IU3z5iSD8U',
+    password: 'RR1t2dIIJ3',
     database: 'WaxbmNDvnO'
 });
 
@@ -180,7 +180,7 @@ const getTruckExpenses = async (number, year) => {
           truck[0].stops = truckExpenses.stops;
           truck[0].truckExpenses = truckExpenses.expenses;
           truck[0].fuelByCash = truckExpenses.fuelByCash;
-          truck[0].truck_expenses = (truckExpenses.stops + truckExpenses.expenses + Number(truckExpenses.fuelByCash));
+          truck[0].truck_expenses = (truckExpenses.stops + truckExpenses.expenses + Number(truckExpenses.fuelByCash)).toFixed(2);
       }
 }
 
@@ -244,7 +244,7 @@ app.get('/api/getTruck', checkJwt, async (req, res) => {
     });
     } finally {
         if (truck.length){
-            truck[0].truck_result = truck[0].truck_recieved - truck[0].truck_expenses - truck[0].truck_delivered;//not full formula
+            truck[0].truck_result = (truck[0].truck_recieved - truck[0].truck_expenses - truck[0].truck_delivered).toFixed(2);
         }
       res.send({
         msg: truck
@@ -772,7 +772,7 @@ const fillMainTable = async (data, partsCost, wheelsCost) => {
         data[i].wheels ? true : data[i].wheels = 0;
         data[i].distance = data[i].speedometer_end - data[i].speedometer_start;
         data[i].driver_salary = data[i].earned * 0.15;
-        data[i].income = data[i].earned - data[i].driver_salary - data[i].expenses - data[i].car_parts - data[i].fuel;
+        data[i].income = (data[i].earned - data[i].driver_salary - data[i].expenses - data[i].car_parts - data[i].fuel).toFixed(2);
     }
 }
 
@@ -855,7 +855,7 @@ const getWheelsData = async () => {
 
 app.get('/api/getMain', checkJwt, async (req, res) => {
     try {
-      const rows = await query('select * from main_table');
+      const rows = await query('select * from main_table order by id desc');
       await setTwoDatesToLocal(rows);
       const partsCost = await getCarPartsData();
       const wheelsCost = await getWheelsData();
