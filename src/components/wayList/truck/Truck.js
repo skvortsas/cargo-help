@@ -97,8 +97,8 @@ const Truck = (props) => {
                 accessor: 'truck_delivered'
             },
             {
-                Header: 'Суточные',
-                accessor: 'daily_money'
+                Header: 'Удержать',
+                accessor: 'hold'
             },
             {
                 Header: 'Расходы в рейсе',

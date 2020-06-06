@@ -42,6 +42,10 @@ const Expeditions = (props) => {
                 Header: 'Нал/Безнал',
                 accessor: 'cash'
             },
+            {
+                Header: 'На самом деле',
+                accessor: 'earned_indeed'
+            },
         ], []
     );
 
