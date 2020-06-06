@@ -28,6 +28,12 @@ import {
   useTable,
 } from 'react-table';
 
+import styled from 'styled-components';
+
+const LinkedInput = styled.input`
+  cursor: pointer
+`
+
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -226,15 +232,16 @@ const EditableCell = ({
                 {
                   id === 'distance' || id === 'average_tractor_expenses'
                   || id === 'average_installation_expenses'
-                  ? (<Link to={{
+                  ? (<Link 
+                    to={{
                     pathname: 'way-list',
                     state: {
                       redirectedNumber: original.way_list_number,
                       redirectedYear: original.way_list_year
                       }
                     }}>
-                    <input
-                      style={spanStyle}
+                    <LinkedInput
+                      style={ spanStyle }
                       value={value}
                       onClick={onInputClick}
                       disabled
@@ -248,7 +255,7 @@ const EditableCell = ({
                         redirectedYear: original.way_list_year
                         }
                       }}>
-                      <input
+                      <LinkedInput
                         style={spanStyle}
                         value={value}
                         onClick={onInputClick}
@@ -263,7 +270,7 @@ const EditableCell = ({
                             redirectedYear: original.way_list_year
                             }
                           }}>
-                          <input
+                          <LinkedInput
                             style={spanStyle}
                             value={value}
                             onClick={onInputClick}
@@ -278,7 +285,7 @@ const EditableCell = ({
                             redirectedYear: original.way_list_year
                             }
                           }}>
-                          <input
+                          <LinkedInput
                             style={spanStyle}
                             value={value}
                             onClick={onInputClick}
@@ -293,7 +300,7 @@ const EditableCell = ({
                             redirectedYear: original.way_list_year
                             }
                           }}>
-                          <input
+                          <LinkedInput
                             style={spanStyle}
                             value={value}
                             onClick={onInputClick}
