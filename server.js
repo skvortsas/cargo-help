@@ -788,7 +788,7 @@ const fillMainTable = async (data, partsCost, wheelsCost, moneyToHold, earnedMon
         data[i].car_parts ? true : data[i].car_parts = 0;
         data[i].wheels ? true : data[i].wheels = 0;
         data[i].distance = data[i].speedometer_end - data[i].speedometer_start;
-        data[i].driver_salary = data[i].earned * 0.15 - data[i].hold;
+        data[i].driver_salary = (data[i].earned * 0.15 - data[i].hold).toFixed(2);
         data[i].income = (data[i].earned_indeed - data[i].driver_salary - data[i].expenses - data[i].car_parts - data[i].fuel).toFixed(2);
     }
 }

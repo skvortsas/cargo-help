@@ -231,7 +231,7 @@ const EditableCell = ({
                 }
                 {
                   id === 'distance' || id === 'average_tractor_expenses'
-                  || id === 'average_installation_expenses'
+                  || id === 'average_installation_expenses' || id === 'driver_salary'
                   ? (<Link 
                     to={{
                     pathname: 'way-list',
@@ -528,6 +528,7 @@ const EnhancedTable = ({
         setSearchQuery={setSearchQuery}
         selectValue={selectValue}
         setSelectValue={setSelectValue}
+        data={data}
       />
       <Snackbar
         open={toast}

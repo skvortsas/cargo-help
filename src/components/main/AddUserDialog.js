@@ -94,7 +94,7 @@ const AddUserDialog = props => {
 
   return (
     <div>
-      <Tooltip title="Add">
+      <Tooltip title="Добавить">
         <IconButton aria-label="add" onClick={handleClickOpen}>
           <AddIcon />
         </IconButton>
@@ -227,7 +227,7 @@ const AddUserDialog = props => {
           <Tooltip title="Добавить несколько">
             <Switch
               checked={switchState.addMultiple}
-              onChange={handleSwitchChange('addMultiple')}
+              onChange={handleSwitchChange('Добавить несколько')}
               value="addMultiple"
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />

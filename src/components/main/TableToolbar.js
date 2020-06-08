@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 
 import AddUserDialog from './AddUserDialog'
 import clsx from 'clsx'
@@ -11,7 +11,13 @@ import SelectField from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import { TextField } from '@material-ui/core'
+import { TextField } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
+
+import GetAppIcon from '@material-ui/icons/GetApp';
+
+import { CSVLink } from 'react-csv'
+import { useAsyncDebounce } from 'react-table'
 
 const useToolbarStyles = makeStyles(theme => ({
   root: {
@@ -41,10 +47,14 @@ const useToolbarStyles = makeStyles(theme => ({
     margin: theme.spacing(1),
     minWidth: 200,
   },
+  downloadLink: {
+    color: 'black',
+  }
 }))
 
 const TableToolbar = props => {
     const [selectOpened, setSelectOpened] = useState(false);
+    const [downloadData, setDownloadData] = useState([]);
 
     const openSelect = () => {
         setSelectOpened(true);
@@ -53,6 +63,7 @@ const TableToolbar = props => {
     const closeSelect = () => {
         setSelectOpened(false);
     }
+
 
   const classes = useToolbarStyles()
   const {
@@ -65,7 +76,39 @@ const TableToolbar = props => {
     setSearchQuery,
     selectValue,
     setSelectValue,
-  } = props
+    data,
+  } = props;
+
+  useEffect(() => {
+    if(data.length) {
+      let tmpData = [];
+      data.map(item => {
+        tmpData.push({
+          '№ путевого': item['way_list_number'],
+          'Год путевого': item['way_list_year'],
+          'Водитель': item['driver'],
+          '№ тягача': item['number_of_tractor'],
+          '№ рефа': item['number_of_installation'],
+          'Дата отбытия': item['date_start'],
+          'Дата прибытия': item['date_end'],
+          'Пройдено': item['distance'],
+          'Ср. расход тягача': item['average_tractor_expenses'],
+          'Ср. расход рефа': item['average_installation_expenses'],
+          'Расходы в рейсе': item['expenses'],
+          'Расходы на топливо': item['fuel'],
+          'Расходы на запчасти': item['car_parts'],
+          'Расходы на колеса': item['wheels'],
+          'Зп водителя': item['driver_salary'],
+          'Из них удержано': item['hold'],
+          'Заработано с рейса': item['earned'],
+          'Заработано на самом деле': item['earned_indeed'],
+          'Доход': item['income'],
+        });
+      });
+      setDownloadData(tmpData);
+      }
+  }, [data]);
+
   return (
     <Toolbar
       className={clsx(classes.root, {
@@ -77,6 +120,12 @@ const TableToolbar = props => {
         <Typography variant="h6" id="tableTitle">
           Добавить лист
         </Typography>
+        {
+          downloadData.length
+          && (<Tooltip title='Скачать в Excel'>
+              <CSVLink className={ classes.downloadLink } data={downloadData} filename={'Распечатка_из_приложения.xls'}><GetAppIcon /></CSVLink>
+            </Tooltip>)
+        }
         </div>
 
         <div className={classes.centeredItems}>
