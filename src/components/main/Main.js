@@ -205,7 +205,7 @@ useEffect(() => {
           columns={columns}
           data={searchQuery 
                   ? selectValue === 'driver'
-                      ? (apiMessage.msg).filter(x => x[selectValue].includes(searchQuery))
+                      ? (apiMessage.msg).filter(x => ((x[selectValue]).toLowerCase()).includes(searchQuery.toLowerCase()))
                       : selectValue === 'way_list_number'
                       || selectValue === 'number_of_tractor'
                       || selectValue === 'number_of_installation'

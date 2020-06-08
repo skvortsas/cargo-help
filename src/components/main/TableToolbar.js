@@ -97,9 +97,10 @@ const TableToolbar = props => {
                 <em>Пусто</em>
             </MenuItem>
             {columns.map(column => (
-                <MenuItem key={column.accessor} value={column.accessor}>
-                    {column.Header}
-                </MenuItem>
+                column.accessor !== 'compound' && column.accessor !== 'delete'
+                && (<MenuItem key={column.accessor} value={column.accessor}>
+                      {column.Header}
+                    </MenuItem>)
             ))}
         </SelectField>
         </FormControl>
