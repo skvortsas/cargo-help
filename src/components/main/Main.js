@@ -252,8 +252,8 @@ useEffect(() => {
 }
 
 function formatDate(dateString) {
-  let dates = dateString.split('.');
-  return([dates[2], dates[1], dates[0]].join('-'));
+  let dates = dateString.split('/');
+  return([dates[2], dates[0], dates[1]].join('-'));
 }
 
 const getError = errno => {
